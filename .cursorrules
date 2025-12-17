@@ -1,66 +1,196 @@
-# 🏹 Cursor Rules for a React Native (Expo + JS) Project
+# Cursor Rules for React Native (Expo + JS) Project
 
-## 1️⃣ Project Structure
+## Project Structure
 
-Organize your project using a **feature + domain-oriented structure**, not flat organization:
+Use a **feature + domain-oriented structure** for scalability and maintainability:
 
 ```
 src/
- ├── assets/          # Images, fonts, icons, Lottie files
- ├── components/      # Reusable UI components (Buttons, Cards, etc.)
- ├── navigation/      # Stack, Tab, Drawer navigators
- ├── screens/         # Screen components (Home, Profile)
- ├── hooks/           # Custom hooks
- ├── services/        # API calls, local storage, analytics
- ├── store/           # Redux / Zustand / Context
- ├── utils/           # Helper functions
- ├── constants/       # Colors, spacing, typography
- └── App.js
+├── components/              # Reusable UI components (outside screens)
+│   ├── Button/
+│   │   ├── Button.js
+│   │   └── Button.styles.js
+│   ├── Card/
+│   │   ├── Card.js
+│   │   └── Card.styles.js
+│   ├── Input/
+│   ├── Header/
+│   └── Loading/
+│
+├── screens/                 # Screen components (feature-specific)
+│   ├── HomeScreen.js
+│   ├── ProfileScreen.js
+│   └── AuthScreen.js
+│
+├── navigation/              # Navigation configuration
+│   ├── RootNavigator.js
+│   ├── AuthNavigator.js
+│   └── AppNavigator.js
+│
+├── hooks/                   # Custom hooks
+│   ├── useAuth.js
+│   ├── useFetch.js
+│   └── useAppState.js
+│
+├── services/                # API calls, storage, external services
+│   ├── api.js
+│   ├── storage.js
+│   ├── logger.js
+│   └── analytics.js
+│
+├── store/                   # State management (Redux/Zustand/Context)
+│   ├── authSlice.js
+│   ├── userSlice.js
+│   └── store.js
+│
+├── constants/               # Global constants
+│   ├── colors.js
+│   ├── spacing.js
+│   ├── typography.js
+│   ├── sizes.js
+│   └── endpoints.js
+│
+├── utils/                   # Utility functions
+│   ├── validators.js
+│   ├── formatters.js
+│   ├── helpers.js
+│   └── errorHandler.js
+│
+├── assets/                  # Images, fonts, Lottie animations
+│   ├── images/
+│   ├── fonts/
+│   └── animations/
+│
+├── App.js
+├── .env
+└── .gitignore
 ```
 
 ---
 
-## 2️⃣ Naming Conventions
+## Naming Conventions
 
-- **Components** → PascalCase (e.g., `HomeScreen`, `CustomButton`)
-- **Files** → PascalCase.js for screens/components, camelCase.js for utils/hooks
-- **Variables & Functions** → camelCase
-- **Constants** → UPPER_SNAKE_CASE
-
----
-
-## 3️⃣ Component Rules
-
-- Prefer **functional components + hooks** over class components
-- Use memoization (`React.memo`, `useMemo`, `useCallback`) for expensive components
-- Keep presentational components dumb; business logic in hooks or services
-- Keep components small (**<150 LOC**) — 1 screen = 1 component + children components
+- **Components** → PascalCase (e.g., `CustomButton.js`, `UserCard.js`)
+- **Screens** → PascalCase with `Screen` suffix (e.g., `HomeScreen.js`)
+- **Hooks** → camelCase with `use` prefix (e.g., `useAuth.js`)
+- **Services/Utils** → camelCase (e.g., `storage.js`, `validators.js`)
+- **Constants** → UPPER_SNAKE_CASE (e.g., `PRIMARY_COLOR`, `API_BASE_URL`)
+- **Style files** → ComponentName.styles.js (e.g., `Button.styles.js`)
 
 ---
 
-## 4️⃣ State Management
+## Component Rules
 
-- **Local state** → `useState` / `useReducer`
-- **Global state** → Redux / Zustand / Context API
-- Never pass deeply nested props; use Context or store instead
-- Isolate async storage / secure storage in `services/storage.js`
+- Prefer **functional components with hooks** over class components
+- All reusable components should live in `src/components/` (not buried in screens)
+- One component per folder for better organization and scalability
+- Use `React.memo()` for components receiving props to prevent unnecessary re-renders
+- Keep components focused and small (< 150 lines of code)
+- Extract business logic into custom hooks or services
+- Use prop-types for all components
+
+```javascript
+// Example: src/components/Button/Button.js
+import React from 'react';
+import PropTypes from 'prop-types';
+import { TouchableOpacity, Text } from 'react-native';
+import styles from './Button.styles';
+
+const Button = React.memo(({ label, onPress, variant = 'primary' }) => (
+  <TouchableOpacity 
+    style={[styles.button, styles[variant]]} 
+    onPress={onPress}
+  >
+    <Text style={styles.text}>{label}</Text>
+  </TouchableOpacity>
+));
+
+Button.propTypes = {
+  label: PropTypes.string.isRequired,
+  onPress: PropTypes.func.isRequired,
+  variant: PropTypes.oneOf(['primary', 'secondary']),
+};
+
+export default Button;
+```
 
 ---
 
-## 5️⃣ Navigation Rules
+## State Management
 
-- Use React Navigation latest version
-- Stack navigator for main flows
-- Bottom tabs only for persistent navigation
-- Never nest too deeply (2–3 levels max)
-- Keep navigation logic centralized in `navigation/RootNavigator.js`
+- **Local state** → `useState` for simple state, `useReducer` for complex logic
+- **Global state** → Context API for small apps, Redux/Zustand for larger apps
+- Avoid prop drilling; use Context or state management store for shared state
+- Isolate async/secure storage logic in `services/storage.js`
+
+```javascript
+// Example: services/storage.js
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export const setItem = async (key, value) => {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(value));
+    return { success: true };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
+
+export const getItem = async (key) => {
+  try {
+    const value = await AsyncStorage.getItem(key);
+    return { success: true, data: value ? JSON.parse(value) : null };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
+```
 
 ---
 
-## 6️⃣ Styling Rules
+## Navigation Rules
 
-- Use `StyleSheet.create` for performance
-- Use constants for colors, spacing, typography:
+- Use React Navigation (latest version)
+- Keep all navigation logic centralized in `navigation/RootNavigator.js`
+- Use Stack Navigator for feature flows
+- Use Bottom Tab Navigator only for persistent main navigation
+- Limit nesting to 2-3 levels maximum
+- Define navigation structure at app startup, not dynamically
+
+```javascript
+// Example: navigation/RootNavigator.js
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useAuth } from '../hooks/useAuth';
+import AuthNavigator from './AuthNavigator';
+import AppNavigator from './AppNavigator';
+
+const Stack = createNativeStackNavigator();
+
+export default function RootNavigator() {
+  const { isLoggedIn } = useAuth();
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {isLoggedIn ? <AppNavigator /> : <AuthNavigator />}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+```
+
+---
+
+## Styling Rules
+
+- Use `StyleSheet.create()` for performance optimization
+- Store all colors, spacing, and typography in `constants/`
+- Create separate `.styles.js` files for complex component styling
+- Use flexbox for layout; avoid absolute positioning unless necessary
+- Use responsive design with `Dimensions` or `react-native-size-matters`
+- Avoid inline styles in components
 
 ```javascript
 // constants/colors.js
@@ -68,21 +198,54 @@ export const COLORS = {
   primary: '#007AFF',
   secondary: '#FF9500',
   background: '#F2F2F2',
-  text: '#333'
+  text: '#333',
+  textLight: '#999',
+  border: '#E0E0E0',
+  error: '#FF3B30',
+  success: '#34C759',
 };
-```
 
-- Use flexbox layout only; avoid absolute positioning unless necessary
-- Avoid inline styles in large components → only for tiny one-off tweaks
-- Prefer responsive design using `Dimensions` or `react-native-size-matters`
+// constants/spacing.js
+export const SPACING = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+};
+
+// components/Button/Button.styles.js
+import { StyleSheet } from 'react-native';
+import { COLORS, SPACING } from '../../constants';
+
+export default StyleSheet.create({
+  button: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  primary: {
+    backgroundColor: COLORS.primary,
+  },
+  secondary: {
+    backgroundColor: COLORS.secondary,
+  },
+  text: {
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
+```
 
 ---
 
-## 7️⃣ API / Services Rules
+## API & Services Rules
 
-- Keep API calls in `services/`
-- Use axios (or fetch wrapper) with interceptors for auth and error handling
-- All service methods should return consistent shape:
+- Keep all API calls in `services/api.js`
+- Use axios or a fetch wrapper with interceptors for authentication and error handling
+- All service methods should return a consistent response shape:
 
 ```javascript
 {
@@ -92,84 +255,274 @@ export const COLORS = {
 }
 ```
 
-- Always handle errors gracefully in UI
-
----
-
-## 8️⃣ Hooks Rules
-
-- Custom hooks go in `src/hooks/`
-- Name hooks starting with `use` (e.g., `useAuth`, `useFetch`)
-- Keep hooks pure and reusable
-- No hooks inside loops, conditions, or nested functions
-
----
-
-## 9️⃣ Performance Rules
-
-- Avoid anonymous functions in render when possible
-- Use `FlatList` / `SectionList` for lists > 10 items
-- Use `keyExtractor` for lists to avoid re-renders
-- Use `React.memo` for components that receive props
-- Avoid heavy computations in render → use `useMemo`
-
----
-
-## 🔟 Code Quality Rules
-
-- Always configure ESLint + Prettier
-- Always use prop-types for components
-- Keep functions <50 LOC
-- Prefer destructuring props
-- No `console.log` in production; use a logger service
-- Use optional chaining and null checks to avoid crashes
-
----
-
-## 1️⃣1️⃣ Icons & Assets
-
-- Use `@expo/vector-icons` only
-- Never load icons dynamically via react-icons (web-only)
-- Put assets in `assets/` and reference via constants:
+- Always handle errors gracefully and show user-friendly messages
+- Use environment variables for API endpoints
 
 ```javascript
-// constants/icons.js
-import { Ionicons } from '@expo/vector-icons';
+// services/api.js
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const ICONS = {
-  home: <Ionicons name="home" size={24} color="#000" />,
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+// Request interceptor
+apiClient.interceptors.request.use(
+  async (config) => {
+    const token = await AsyncStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Handle unauthorized
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const fetchUsers = async () => {
+  try {
+    const { data } = await apiClient.get('/users');
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export default apiClient;
+```
+
+---
+
+## Hooks Rules
+
+- All custom hooks in `src/hooks/` with names starting with `use`
+- Keep hooks pure and reusable with single responsibility
+- Never call hooks conditionally or inside loops
+- Extract side effects and logic from components into hooks
+
+```javascript
+// hooks/useFetch.js
+import { useState, useEffect } from 'react';
+
+export const useFetch = (url) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(url);
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [url]);
+
+  return { data, loading, error };
 };
 ```
 
 ---
 
-## 1️⃣2️⃣ Environment Variables
+## Performance Rules
 
-- Use `.env` for API URLs, keys
-- Do not commit `.env` to Git
-- Use `expo-constants` if you need env in Expo
+- Use `FlatList` or `SectionList` for lists with more than 10 items
+- Always provide `keyExtractor` for lists
+- Wrap expensive components with `React.memo()`
+- Use `useMemo()` for expensive calculations
+- Use `useCallback()` for callbacks passed to memoized components
+- Avoid creating new objects/arrays in render methods
+- Avoid anonymous functions in callbacks
+
+```javascript
+// Good: Memoized component with useCallback
+const UserList = React.memo(({ users, onSelectUser }) => (
+  <FlatList
+    data={users}
+    keyExtractor={(item) => item.id.toString()}
+    renderItem={({ item }) => (
+      <UserCard user={item} onPress={() => onSelectUser(item.id)} />
+    )}
+  />
+));
+
+// Good: useCallback prevents unnecessary re-renders
+const handleSelect = useCallback((userId) => {
+  // Handle user selection
+}, []);
+```
 
 ---
 
-## 1️⃣3️⃣ Testing Rules
+## Code Quality Rules
 
-- Use Jest + React Native Testing Library
-- Test all components, hooks, and services
-- Keep snapshots only for small components
+- Configure ESLint and Prettier from project start
+- Use prop-types for all component props validation
+- Keep functions under 50 lines of code
+- Destructure props and imports
+- No `console.log` in production; use a logger service
+- Use optional chaining (`?.`) and nullish coalescing (`??`) to prevent crashes
+- Write meaningful variable and function names
+
+```javascript
+// services/logger.js
+export const logError = (error, context) => {
+  if (__DEV__) {
+    console.error(`[${context}]`, error);
+  } else {
+    // Send to error tracking service (e.g., Sentry)
+  }
+};
+
+export const logInfo = (message, data) => {
+  if (__DEV__) {
+    console.log(message, data);
+  }
+};
+```
 
 ---
 
-## 1️⃣4️⃣ Git / Versioning
+## Icons & Assets
 
-- Use feature branches (e.g., `feature/home-screen`)
-- Always write clear commit messages
-- Use `.gitignore` → exclude `node_modules`, `.expo`, `.env`
+- Use `@expo/vector-icons` for all icons
+- Never use web-only icon libraries like react-icons
+- Store icon references in constants for reusability
+
+```javascript
+// constants/icons.js
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+
+export const getIcon = (name, iconSet = 'ionicons') => {
+  const IconComponent = iconSet === 'material' ? MaterialCommunityIcons : Ionicons;
+  return <IconComponent name={name} size={24} color="#000" />;
+};
+
+export const ICON_SIZES = {
+  small: 16,
+  medium: 24,
+  large: 32,
+};
+```
 
 ---
 
-## 1️⃣5️⃣ Misc Best Practices
+## Environment Variables
 
-- Always use `SafeAreaView` for iOS / Android
-- Avoid magic numbers → use constants
-- Prefer `animated` + `reanimated` v2 for performant animations
-- Keep `App.js` clean → just `NavigationContainer` + Providers
+- Store API URLs, keys, and configuration in `.env`
+- Never commit `.env` to Git
+- Use `expo-constants` for accessing environment variables in Expo apps
+
+```env
+# .env
+REACT_APP_API_URL=https://api.example.com
+REACT_APP_API_KEY=your_key_here
+```
+
+```javascript
+// services/api.js
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.apiUrl;
+const API_KEY = Constants.expoConfig?.extra?.apiKey;
+```
+
+---
+
+## Testing Rules
+
+- Use Jest and React Native Testing Library
+- Test components, hooks, and services
+- Keep snapshots minimal; use them only for small components
+- Aim for at least 80% code coverage on critical features
+
+```javascript
+// Button.test.js
+import { render, fireEvent } from '@testing-library/react-native';
+import Button from './Button';
+
+describe('Button Component', () => {
+  it('should call onPress when pressed', () => {
+    const mockPress = jest.fn();
+    const { getByText } = render(
+      <Button label="Click me" onPress={mockPress} />
+    );
+
+    fireEvent.press(getByText('Click me'));
+    expect(mockPress).toHaveBeenCalled();
+  });
+});
+```
+
+---
+
+## Git & Versioning
+
+- Use feature branches: `feature/feature-name`
+- Use fix branches for bugs: `fix/bug-name`
+- Write clear, descriptive commit messages
+- Include `.gitignore` with: `node_modules/`, `.expo/`, `.env`, `*.jks`, `*.p8`
+- Review and test before merging to main/master
+
+```
+.gitignore
+node_modules/
+.expo/
+.expo-shared/
+dist/
+.env
+*.jks
+*.p8
+.DS_Store
+```
+
+---
+
+## Best Practices
+
+- Always wrap screens with `SafeAreaView` for iOS and Android
+- Use constants instead of magic numbers and strings
+- Use `reanimated` v2 for complex animations (avoid Animated API)
+- Keep `App.js` minimal: just `NavigationContainer` and global providers
+- Use error boundaries to catch component errors
+- Test on both iOS and Android before release
+- Use TypeScript for type safety (optional but recommended for larger projects)
+
+```javascript
+// App.js - Clean and minimal
+import React from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider } from 'react-redux'; // or your state manager
+import { store } from './src/store';
+import RootNavigator from './src/navigation/RootNavigator';
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <RootNavigator />
+      </Provider>
+    </SafeAreaProvider>
+  );
+}
+```
