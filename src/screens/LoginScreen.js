@@ -26,6 +26,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = () => {
     // Placeholder for login logic
+    navigation.replace('Home');
   };
 
   return (

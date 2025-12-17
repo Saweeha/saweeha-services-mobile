@@ -28,6 +28,7 @@ const RegisterScreen = ({ navigation }) => {
 
   const handleRegister = () => {
     // Placeholder for register logic
+    navigation.replace('Home');
   };
 
   return (
