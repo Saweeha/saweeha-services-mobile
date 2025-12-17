@@ -1,8 +1,8 @@
 export const COLORS = {
-  primary: '#6366F1', // Indigo - modern and professional
+  primary: '#6366F1',
   primaryDark: '#4F46E5',
   primaryLight: '#818CF8',
-  secondary: '#EC4899', // Pink accent
+  secondary: '#EC4899',
   background: '#FFFFFF',
   backgroundLight: '#F8FAFC',
   backgroundDark: '#F1F5F9',
