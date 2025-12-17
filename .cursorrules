@@ -1,0 +1,175 @@
+# 🏹 Cursor Rules for a React Native (Expo + JS) Project
+
+## 1️⃣ Project Structure
+
+Organize your project using a **feature + domain-oriented structure**, not flat organization:
+
+```
+src/
+ ├── assets/          # Images, fonts, icons, Lottie files
+ ├── components/      # Reusable UI components (Buttons, Cards, etc.)
+ ├── navigation/      # Stack, Tab, Drawer navigators
+ ├── screens/         # Screen components (Home, Profile)
+ ├── hooks/           # Custom hooks
+ ├── services/        # API calls, local storage, analytics
+ ├── store/           # Redux / Zustand / Context
+ ├── utils/           # Helper functions
+ ├── constants/       # Colors, spacing, typography
+ └── App.js
+```
+
+---
+
+## 2️⃣ Naming Conventions
+
+- **Components** → PascalCase (e.g., `HomeScreen`, `CustomButton`)
+- **Files** → PascalCase.js for screens/components, camelCase.js for utils/hooks
+- **Variables & Functions** → camelCase
+- **Constants** → UPPER_SNAKE_CASE
+
+---
+
+## 3️⃣ Component Rules
+
+- Prefer **functional components + hooks** over class components
+- Use memoization (`React.memo`, `useMemo`, `useCallback`) for expensive components
+- Keep presentational components dumb; business logic in hooks or services
+- Keep components small (**<150 LOC**) — 1 screen = 1 component + children components
+
+---
+
+## 4️⃣ State Management
+
+- **Local state** → `useState` / `useReducer`
+- **Global state** → Redux / Zustand / Context API
+- Never pass deeply nested props; use Context or store instead
+- Isolate async storage / secure storage in `services/storage.js`
+
+---
+
+## 5️⃣ Navigation Rules
+
+- Use React Navigation latest version
+- Stack navigator for main flows
+- Bottom tabs only for persistent navigation
+- Never nest too deeply (2–3 levels max)
+- Keep navigation logic centralized in `navigation/RootNavigator.js`
+
+---
+
+## 6️⃣ Styling Rules
+
+- Use `StyleSheet.create` for performance
+- Use constants for colors, spacing, typography:
+
+```javascript
+// constants/colors.js
+export const COLORS = {
+  primary: '#007AFF',
+  secondary: '#FF9500',
+  background: '#F2F2F2',
+  text: '#333'
+};
+```
+
+- Use flexbox layout only; avoid absolute positioning unless necessary
+- Avoid inline styles in large components → only for tiny one-off tweaks
+- Prefer responsive design using `Dimensions` or `react-native-size-matters`
+
+---
+
+## 7️⃣ API / Services Rules
+
+- Keep API calls in `services/`
+- Use axios (or fetch wrapper) with interceptors for auth and error handling
+- All service methods should return consistent shape:
+
+```javascript
+{
+  success: true,
+  data: {...},
+  error: null
+}
+```
+
+- Always handle errors gracefully in UI
+
+---
+
+## 8️⃣ Hooks Rules
+
+- Custom hooks go in `src/hooks/`
+- Name hooks starting with `use` (e.g., `useAuth`, `useFetch`)
+- Keep hooks pure and reusable
+- No hooks inside loops, conditions, or nested functions
+
+---
+
+## 9️⃣ Performance Rules
+
+- Avoid anonymous functions in render when possible
+- Use `FlatList` / `SectionList` for lists > 10 items
+- Use `keyExtractor` for lists to avoid re-renders
+- Use `React.memo` for components that receive props
+- Avoid heavy computations in render → use `useMemo`
+
+---
+
+## 🔟 Code Quality Rules
+
+- Always configure ESLint + Prettier
+- Always use prop-types for components
+- Keep functions <50 LOC
+- Prefer destructuring props
+- No `console.log` in production; use a logger service
+- Use optional chaining and null checks to avoid crashes
+
+---
+
+## 1️⃣1️⃣ Icons & Assets
+
+- Use `@expo/vector-icons` only
+- Never load icons dynamically via react-icons (web-only)
+- Put assets in `assets/` and reference via constants:
+
+```javascript
+// constants/icons.js
+import { Ionicons } from '@expo/vector-icons';
+
+export const ICONS = {
+  home: <Ionicons name="home" size={24} color="#000" />,
+};
+```
+
+---
+
+## 1️⃣2️⃣ Environment Variables
+
+- Use `.env` for API URLs, keys
+- Do not commit `.env` to Git
+- Use `expo-constants` if you need env in Expo
+
+---
+
+## 1️⃣3️⃣ Testing Rules
+
+- Use Jest + React Native Testing Library
+- Test all components, hooks, and services
+- Keep snapshots only for small components
+
+---
+
+## 1️⃣4️⃣ Git / Versioning
+
+- Use feature branches (e.g., `feature/home-screen`)
+- Always write clear commit messages
+- Use `.gitignore` → exclude `node_modules`, `.expo`, `.env`
+
+---
+
+## 1️⃣5️⃣ Misc Best Practices
+
+- Always use `SafeAreaView` for iOS / Android
+- Avoid magic numbers → use constants
+- Prefer `animated` + `reanimated` v2 for performant animations
+- Keep `App.js` clean → just `NavigationContainer` + Providers
