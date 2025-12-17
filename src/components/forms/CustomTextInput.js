@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
@@ -17,13 +17,19 @@ const CustomTextInput = ({
   autoCorrect = true,
   style,
 }) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
-    <View style={[styles.container, style]}>
+    <View style={[
+      styles.container,
+      isFocused && styles.containerFocused,
+      style
+    ]}>
       {icon && (
         <Ionicons
           name={icon}
           size={20}
-          color={COLORS.textSecondary}
+          color={isFocused ? COLORS.primary : COLORS.textSecondary}
           style={styles.icon}
         />
       )}
@@ -37,6 +43,8 @@ const CustomTextInput = ({
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
         autoCorrect={autoCorrect}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       />
       {showPasswordToggle && (
         <TouchableOpacity onPress={onTogglePassword} style={styles.eyeIcon}>
@@ -61,6 +69,26 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     paddingHorizontal: 16,
     paddingVertical: 16,
+    shadowColor: COLORS.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  containerFocused: {
+    borderColor: COLORS.primary,
+    borderWidth: 2,
+    shadowColor: COLORS.primary,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 6,
   },
   icon: {
     marginRight: 12,
