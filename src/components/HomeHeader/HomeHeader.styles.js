@@ -1,15 +1,14 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing';
 import { SIZES } from '../../constants/sizes';
 import { TYPOGRAPHY } from '../../constants/typography';
 
-export default StyleSheet.create({
+const createHomeHeaderStyles = (colors) => StyleSheet.create({
   header: {
     paddingHorizontal: SPACING.md,
     paddingTop: SPACING.sm,
     paddingBottom: SPACING.lg,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   headerTop: {
     flexDirection: 'row',
@@ -23,7 +22,7 @@ export default StyleSheet.create({
   headerTitle: {
     fontSize: TYPOGRAPHY.fontSize.display,
     fontFamily: TYPOGRAPHY.fontFamily.semibold,
-    color: COLORS.text,
+    color: colors.text,
     letterSpacing: -1,
   },
   notificationButton: {
@@ -31,7 +30,7 @@ export default StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: SIZES.radius.md,
-    backgroundColor: COLORS.backgroundLight,
+    backgroundColor: colors.backgroundLight,
     justifyContent: 'center',
     alignItems: 'center',
     ...SIZES.shadow.small,
@@ -43,8 +42,10 @@ export default StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.error,
+    backgroundColor: colors.error,
   },
 });
+
+export default createHomeHeaderStyles;
 
 

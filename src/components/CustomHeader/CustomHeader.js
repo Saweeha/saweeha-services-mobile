@@ -3,18 +3,20 @@ import PropTypes from 'prop-types';
 import { View, Text, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import styles from './CustomHeader.styles';
-import { COLORS } from '../../constants/colors';
+import createStyles from './CustomHeader.styles';
 import { TYPOGRAPHY } from '../../constants/typography';
+import { useThemeColors } from '../../hooks/useTheme';
 
-const CustomHeader = React.memo(({ 
-  title, 
-  onBackPress, 
+const CustomHeader = React.memo(({
+  title,
+  onBackPress,
   showBackButton = true,
   rightComponent,
 }) => {
   const insets = useSafeAreaInsets();
   const headerHeight = 64 + insets.top;
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
 
   return (
     <View style={[styles.container, { height: headerHeight, paddingTop: insets.top }]}>
@@ -33,7 +35,7 @@ const CustomHeader = React.memo(({
                 <Ionicons 
                   name="arrow-back" 
                   size={22} 
-                  color={COLORS.primary} 
+                  color={colors.primary} 
                 />
               </View>
             </TouchableOpacity>

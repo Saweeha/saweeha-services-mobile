@@ -1,12 +1,11 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { COLORS } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing';
 import { SIZES } from '../../constants/sizes';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - SPACING.md * 2;
 
-export default StyleSheet.create({
+const createPromotionSwiperStyles = (colors, isDark = false) => StyleSheet.create({
   container: {
     marginBottom: SPACING.md,
   },
@@ -54,15 +53,18 @@ export default StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: COLORS.textWhite,
-    opacity: 0.5,
+    backgroundColor: isDark ? colors.textLight : colors.textWhite,
+    opacity: isDark ? 0.7 : 0.5,
   },
   paginationDotActive: {
     width: 24,
     height: 6,
     borderRadius: 3,
-    backgroundColor: COLORS.textWhite,
+    backgroundColor: isDark ? colors.primaryLight : colors.textWhite,
     opacity: 1,
   },
 });
+
+export default createPromotionSwiperStyles;
+
 

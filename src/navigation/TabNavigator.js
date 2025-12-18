@@ -3,9 +3,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Platform } from 'react-native';
-import { COLORS } from '../constants/colors';
 import { SPACING } from '../constants/spacing';
 import { SIZES } from '../constants/sizes';
+import { useTheme } from '../hooks/useTheme';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -16,6 +16,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  const { colors, scheme } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -35,13 +37,13 @@ const TabNavigator = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textLight,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textLight,
         tabBarStyle: styles.tabBar,
         tabBarBackground: () => (
           <BlurView
             intensity={100}
-            tint="light"
+            tint={scheme === 'dark' ? 'dark' : 'light'}
             style={StyleSheet.absoluteFill}
           />
         ),

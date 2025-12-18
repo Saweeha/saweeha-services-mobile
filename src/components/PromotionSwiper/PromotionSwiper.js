@@ -8,10 +8,13 @@ import {
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import PagerView from 'react-native-pager-view';
-import styles from './PromotionSwiper.styles';
-import { COLORS } from '../../constants/colors';
+import createStyles from './PromotionSwiper.styles';
+import { useTheme } from '../../hooks/useTheme';
 
 const PromotionSwiper = React.memo(({ promotions = [], onPress }) => {
+  const { colors, scheme } = useTheme();
+  const isDark = scheme === 'dark';
+  const styles = createStyles(colors, isDark);
   const pagerRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -68,7 +71,7 @@ const PromotionSwiper = React.memo(({ promotions = [], onPress }) => {
                 />
               ) : (
                 <View style={styles.placeholder}>
-                  <Ionicons name="image-outline" size={48} color={COLORS.textLight} />
+                  <Ionicons name="image-outline" size={48} color={colors.textLight} />
                 </View>
               )}
             </TouchableOpacity>
@@ -77,7 +80,11 @@ const PromotionSwiper = React.memo(({ promotions = [], onPress }) => {
       </PagerView>
       {promotions.length > 1 && (
         <View style={styles.paginationContainer}>
-          <BlurView intensity={80} tint="light" style={styles.paginationBlur}>
+          <BlurView
+            intensity={80}
+            tint={isDark ? 'dark' : 'light'}
+            style={styles.paginationBlur}
+          >
             <View style={styles.pagination}>
               {promotions.map((_, index) => (
                 <View

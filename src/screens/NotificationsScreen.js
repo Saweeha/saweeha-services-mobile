@@ -11,13 +11,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 // Constants
-import { COLORS } from '../constants/colors';
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';
 import { NOTIFICATION_ICONS } from '../constants/notifications';
+import { useTheme } from '../hooks/useTheme';
 
 const NotificationsScreen = () => {
+  const { colors } = useTheme();
+
   const [notifications, setNotifications] = useState([
     {
       id: '1',
@@ -109,13 +111,13 @@ const NotificationsScreen = () => {
             <View
               style={[
                 styles.iconContainer,
-            { backgroundColor: typeConfig.iconBg || COLORS.indigo100 },
+                { backgroundColor: typeConfig.iconBg || colors.indigo100 },
               ]}
             >
               <Ionicons
             name={typeConfig.icon || 'notifications-outline'}
             size={22}
-            color={typeConfig.iconColor || COLORS.primary}
+            color={typeConfig.iconColor || colors.primary}
               />
             </View>
 
@@ -149,28 +151,33 @@ const NotificationsScreen = () => {
   const keyExtractor = (item) => item.id;
 
   const ListEmptyComponent = () => (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconContainer}>
-              <Ionicons
-                name="notifications-off-outline"
+    <View style={styles.emptyState}>
+      <View style={styles.emptyIconContainer}>
+        <Ionicons
+          name="notifications-off-outline"
           size={56}
-                color={COLORS.textLight}
-              />
-            </View>
+          color={colors.textLight}
+        />
+      </View>
       <Text style={styles.emptyTitle}>No notifications</Text>
-            <Text style={styles.emptyMessage}>
+      <Text style={styles.emptyMessage}>
         You're all caught up. We'll let you know when there&apos;s something new.
-            </Text>
-          </View>
+      </Text>
+    </View>
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      edges={['bottom']}
+    >
       <View style={styles.headerRow}>
-        <Text style={styles.screenTitle}>Notifications</Text>
+        <Text style={[styles.screenTitle, { color: colors.text }]}>Notifications</Text>
         {unreadCount > 0 && (
           <TouchableOpacity onPress={markAllAsRead} activeOpacity={0.7}>
-            <Text style={styles.markAllText}>Mark all as read</Text>
+            <Text style={[styles.markAllText, { color: colors.primary }]}>
+              Mark all as read
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -190,7 +197,6 @@ const NotificationsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   headerRow: {
     flexDirection: 'row',
@@ -203,12 +209,10 @@ const styles = StyleSheet.create({
   screenTitle: {
     fontSize: TYPOGRAPHY.fontSize.lg,
     fontFamily: TYPOGRAPHY.fontFamily.semibold,
-    color: COLORS.text,
   },
   markAllText: {
     fontSize: TYPOGRAPHY.fontSize.sm,
     fontFamily: TYPOGRAPHY.fontFamily.medium,
-    color: COLORS.primary,
   },
   listContent: {
     paddingHorizontal: SPACING.md,
@@ -222,20 +226,20 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.md,
     borderRadius: SIZES.radius.lg,
-    backgroundColor: COLORS.backgroundLight,
+    backgroundColor: 'transparent',
     ...SIZES.shadow.small,
   },
   rowUnread: {
-    backgroundColor: COLORS.purple50,
+    backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: COLORS.borderPurple,
+    borderColor: 'transparent',
   },
   rowPressed: {
     opacity: 0.7,
   },
   separator: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: COLORS.borderLight,
+    backgroundColor: 'transparent',
   },
   iconContainer: {
     width: 40,
@@ -256,7 +260,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: TYPOGRAPHY.fontSize.md,
     fontFamily: TYPOGRAPHY.fontFamily.regular,
-    color: COLORS.text,
     marginRight: SPACING.xs,
   },
   titleUnread: {
@@ -266,19 +269,16 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: COLORS.primary,
   },
   message: {
     fontSize: TYPOGRAPHY.fontSize.sm,
     fontFamily: TYPOGRAPHY.fontFamily.regular,
-    color: COLORS.textSecondary,
     lineHeight: TYPOGRAPHY.fontSize.sm * TYPOGRAPHY.lineHeight.normal,
     marginBottom: SPACING.xs,
   },
   time: {
     fontSize: TYPOGRAPHY.fontSize.xs,
     fontFamily: TYPOGRAPHY.fontFamily.regular,
-    color: COLORS.textLight,
   },
   emptyState: {
     flex: 1,
@@ -290,7 +290,6 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: COLORS.backgroundSecondary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.lg,
@@ -298,13 +297,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: TYPOGRAPHY.fontSize.lg,
     fontFamily: TYPOGRAPHY.fontFamily.semibold,
-    color: COLORS.text,
     marginBottom: SPACING.sm,
   },
   emptyMessage: {
     fontSize: TYPOGRAPHY.fontSize.sm,
     fontFamily: TYPOGRAPHY.fontFamily.regular,
-    color: COLORS.textSecondary,
     textAlign: 'center',
     paddingHorizontal: SPACING.xl,
   },

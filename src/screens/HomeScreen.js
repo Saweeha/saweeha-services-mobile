@@ -10,14 +10,15 @@ import BusinessCard from '../components/BusinessCard/BusinessCard';
 import HomeHeader from '../components/HomeHeader/HomeHeader';
 
 // Constants
-import { COLORS } from '../constants/colors';
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';
+import { useTheme } from '../hooks/useTheme';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
+  const { colors } = useTheme();
 
   // Mock data - replace with API calls later
   const promotions = [
@@ -40,12 +41,12 @@ const HomeScreen = () => {
   ];
 
   const categories = [
-    { id: '1', name: 'Beauty Salons', icon: 'sparkles', color: COLORS.category1 },
-    { id: '2', name: 'Barbers', icon: 'cut', color: COLORS.category2 },
-    { id: '3', name: 'Massage', icon: 'hand-left', color: COLORS.category3 },
-    { id: '4', name: 'Nail Salons', icon: 'color-palette', color: COLORS.category4 },
-    { id: '5', name: 'Spa & Wellness', icon: 'leaf', color: COLORS.category5 },
-    { id: '6', name: 'Fitness Centers', icon: 'barbell', color: COLORS.category6 },
+    { id: '1', name: 'Beauty Salons', icon: 'sparkles', color: colors.category1 },
+    { id: '2', name: 'Barbers', icon: 'cut', color: colors.category2 },
+    { id: '3', name: 'Massage', icon: 'hand-left', color: colors.category3 },
+    { id: '4', name: 'Nail Salons', icon: 'color-palette', color: colors.category4 },
+    { id: '5', name: 'Spa & Wellness', icon: 'leaf', color: colors.category5 },
+    { id: '6', name: 'Fitness Centers', icon: 'barbell', color: colors.category6 },
   ];
 
   const businesses = [
@@ -95,7 +96,10 @@ const HomeScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      edges={['top']}
+    >
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -121,9 +125,9 @@ const HomeScreen = () => {
         {/* Near You Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Near You</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Near You</Text>
             <TouchableOpacity>
-              <Text style={styles.seeAll}>See All</Text>
+              <Text style={[styles.seeAll, { color: colors.primary }]}>See All</Text>
             </TouchableOpacity>
           </View>
           <FlatList
@@ -139,9 +143,9 @@ const HomeScreen = () => {
         {/* Categories Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Categories</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Categories</Text>
             <TouchableOpacity>
-              <Text style={styles.seeAll}>See All</Text>
+              <Text style={[styles.seeAll, { color: colors.primary }]}>See All</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.categoriesGrid}>
@@ -160,9 +164,9 @@ const HomeScreen = () => {
         {/* Featured Businesses Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Featured Businesses</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Featured Businesses</Text>
             <TouchableOpacity>
-              <Text style={styles.seeAll}>See All</Text>
+              <Text style={[styles.seeAll, { color: colors.primary }]}>See All</Text>
             </TouchableOpacity>
           </View>
           <FlatList
@@ -182,7 +186,6 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollView: {
     flex: 1,
@@ -203,12 +206,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: TYPOGRAPHY.fontSize.xl,
     fontFamily: TYPOGRAPHY.fontFamily.semibold,
-    color: COLORS.text,
   },
   seeAll: {
     fontSize: TYPOGRAPHY.fontSize.sm,
     fontFamily: TYPOGRAPHY.fontFamily.medium,
-    color: COLORS.primary,
   },
   categoriesGrid: {
     flexDirection: 'row',

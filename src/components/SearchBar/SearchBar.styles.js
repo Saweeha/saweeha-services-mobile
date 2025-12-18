@@ -1,27 +1,26 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing';
 import { SIZES } from '../../constants/sizes';
 import { TYPOGRAPHY } from '../../constants/typography';
 
-export default StyleSheet.create({
+const createSearchBarStyles = (colors, isDark = false) => StyleSheet.create({
   searchContainer: {
     marginTop: 0,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.backgroundLight,
+    backgroundColor: colors.backgroundLight,
     borderRadius: SIZES.radius.lg,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
     borderWidth: 1.5,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     ...SIZES.shadow.small,
   },
   searchBarFocused: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.purple50,
+    borderColor: isDark ? colors.textWhite : colors.primary,
+    backgroundColor: isDark ? colors.backgroundLight : colors.purple50,
     ...SIZES.shadow.medium,
   },
   searchIcon: {
@@ -31,9 +30,11 @@ export default StyleSheet.create({
     flex: 1,
     fontSize: TYPOGRAPHY.fontSize.md,
     fontFamily: TYPOGRAPHY.fontFamily.regular,
-    color: COLORS.text,
+    color: colors.text,
     paddingVertical: 0,
   },
 });
+
+export default createSearchBarStyles;
 
 

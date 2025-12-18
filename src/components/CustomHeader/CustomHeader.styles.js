@@ -1,13 +1,12 @@
 import { StyleSheet, Platform } from 'react-native';
-import { COLORS } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { SIZES } from '../../constants/sizes';
 
-export default StyleSheet.create({
+const createCustomHeaderStyles = (colors) => StyleSheet.create({
   container: {
     width: '100%',
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     position: 'relative',
     overflow: 'visible',
   },
@@ -35,7 +34,7 @@ export default StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: SIZES.radius.md,
-    backgroundColor: COLORS.backgroundLight,
+    backgroundColor: colors.backgroundLight,
     justifyContent: 'center',
     alignItems: 'center',
     ...SIZES.shadow.small,
@@ -53,7 +52,7 @@ export default StyleSheet.create({
   title: {
     fontSize: TYPOGRAPHY.fontSize.xxl,
     fontFamily: TYPOGRAPHY.fontFamily.semibold,
-    color: COLORS.text,
+    color: colors.text,
     letterSpacing: -0.5,
   },
   rightContainer: {
@@ -72,7 +71,10 @@ export default StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: colors.border,
     opacity: 0.3,
   },
 });
+
+export default createCustomHeaderStyles;
+

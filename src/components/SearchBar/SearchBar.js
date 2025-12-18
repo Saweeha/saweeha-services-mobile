@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { View, TextInput, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import styles from './SearchBar.styles';
-import { COLORS } from '../../constants/colors';
+import createStyles from './SearchBar.styles';
+import { useTheme } from '../../hooks/useTheme';
 
 const SearchBar = React.memo(
   ({ value, onChangeText, placeholder = 'Search services...' }) => {
     const [isFocused, setIsFocused] = useState(false);
+    const { colors, scheme } = useTheme();
+    const isDark = scheme === 'dark';
+    const styles = createStyles(colors, isDark);
 
     return (
       <View style={styles.searchContainer}>
@@ -15,13 +18,13 @@ const SearchBar = React.memo(
           <Ionicons
             name="search"
             size={20}
-            color={isFocused ? COLORS.primary : COLORS.textLight}
+            color={isFocused ? (isDark ? colors.textWhite : colors.primary) : colors.textLight}
             style={styles.searchIcon}
           />
           <TextInput
             style={styles.searchInput}
             placeholder={placeholder}
-            placeholderTextColor={COLORS.textLight}
+            placeholderTextColor={colors.textLight}
             value={value}
             onChangeText={onChangeText}
             onFocus={() => setIsFocused(true)}
@@ -29,7 +32,7 @@ const SearchBar = React.memo(
           />
           {value?.length > 0 && (
             <TouchableOpacity onPress={() => onChangeText?.('')}>
-              <Ionicons name="close" size={18} color={COLORS.textLight} />
+              <Ionicons name="close" size={18} color={colors.textLight} />
             </TouchableOpacity>
           )}
         </View>

@@ -1,5 +1,4 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { COLORS } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing';
 import { SIZES } from '../../constants/sizes';
 import { TYPOGRAPHY } from '../../constants/typography';
@@ -7,10 +6,10 @@ import { TYPOGRAPHY } from '../../constants/typography';
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.75; // 75% of screen width for horizontal scroll
 
-export default StyleSheet.create({
+const createBusinessCardStyles = (colors) => StyleSheet.create({
   container: {
     width: CARD_WIDTH,
-    backgroundColor: COLORS.backgroundLight,
+    backgroundColor: colors.backgroundLight,
     borderRadius: SIZES.radius.md,
     overflow: 'hidden',
     ...SIZES.shadow.small,
@@ -18,7 +17,7 @@ export default StyleSheet.create({
   image: {
     width: '100%',
     height: 180,
-    backgroundColor: COLORS.border,
+    backgroundColor: colors.border,
   },
   content: {
     padding: SPACING.md,
@@ -26,13 +25,13 @@ export default StyleSheet.create({
   name: {
     fontSize: TYPOGRAPHY.fontSize.lg,
     fontFamily: TYPOGRAPHY.fontFamily.medium,
-    color: COLORS.text,
+    color: colors.text,
     marginBottom: SPACING.xs,
   },
   category: {
     fontSize: TYPOGRAPHY.fontSize.sm,
     fontFamily: TYPOGRAPHY.fontFamily.regular,
-    color: COLORS.textLight,
+    color: colors.textLight,
     marginBottom: SPACING.sm,
   },
   footer: {
@@ -47,7 +46,7 @@ export default StyleSheet.create({
   rating: {
     fontSize: TYPOGRAPHY.fontSize.sm,
     fontFamily: TYPOGRAPHY.fontFamily.medium,
-    color: COLORS.text,
+    color: colors.text,
     marginLeft: SPACING.xs,
   },
   distanceContainer: {
@@ -57,8 +56,11 @@ export default StyleSheet.create({
   distance: {
     fontSize: TYPOGRAPHY.fontSize.sm,
     fontFamily: TYPOGRAPHY.fontFamily.regular,
-    color: COLORS.textLight,
+    color: colors.textLight,
     marginLeft: SPACING.xs,
   },
 });
+
+export default createBusinessCardStyles;
+
 
