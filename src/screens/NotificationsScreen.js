@@ -1,10 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
-  Pressable,
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,8 +13,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';
-import { NOTIFICATION_ICONS } from '../constants/notifications';
 import { useTheme } from '../hooks/useTheme';
+import NotificationItem from '../components/NotificationItem/NotificationItem';
 
 const NotificationsScreen = () => {
   const { colors } = useTheme();
@@ -85,67 +84,20 @@ const NotificationsScreen = () => {
     setNotifications((prev) => prev.map((notif) => ({ ...notif, isRead: true })));
   }, []);
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
-
-  const formatTime = (timeStr) => timeStr;
-
-  const NotificationItem = ({ notification }) => {
-    const handlePress = () => {
-      if (!notification.isRead) {
-        markAsRead(notification.id);
-      }
-    };
-
-    const typeConfig = NOTIFICATION_ICONS[notification.type] || {};
-
-    return (
-      <Pressable
-        onPress={handlePress}
-        style={({ pressed }) => [
-          styles.row,
-          !notification.isRead && styles.rowUnread,
-          pressed && styles.rowPressed,
-        ]}
-      >
-            {/* Icon */}
-            <View
-              style={[
-                styles.iconContainer,
-                { backgroundColor: typeConfig.iconBg || colors.indigo100 },
-              ]}
-            >
-              <Ionicons
-            name={typeConfig.icon || 'notifications-outline'}
-            size={22}
-            color={typeConfig.iconColor || colors.primary}
-              />
-            </View>
-
-            {/* Content */}
-            <View style={styles.textContainer}>
-              <View style={styles.titleRow}>
-            <Text
-              style={[
-                styles.title,
-                !notification.isRead && styles.titleUnread,
-              ]}
-              numberOfLines={1}
-            >
-                  {notification.title}
-                </Text>
-                {!notification.isRead && <View style={styles.unreadDot} />}
-              </View>
-          <Text style={styles.message} numberOfLines={2}>
-                {notification.message}
-              </Text>
-          <Text style={styles.time}>{formatTime(notification.time)}</Text>
-          </View>
-        </Pressable>
-    );
-  };
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.isRead).length,
+    [notifications],
+  );
 
   const renderItem = ({ item }) => (
-    <NotificationItem notification={item} />
+    <NotificationItem
+      notification={item}
+      onPress={() => {
+        if (!item.isRead) {
+          markAsRead(item.id);
+        }
+      }}
+    />
   );
 
   const keyExtractor = (item) => item.id;
@@ -171,17 +123,6 @@ const NotificationsScreen = () => {
       style={[styles.container, { backgroundColor: colors.background }]}
       edges={['bottom']}
     >
-      <View style={styles.headerRow}>
-        <Text style={[styles.screenTitle, { color: colors.text }]}>Notifications</Text>
-        {unreadCount > 0 && (
-          <TouchableOpacity onPress={markAllAsRead} activeOpacity={0.7}>
-            <Text style={[styles.markAllText, { color: colors.primary }]}>
-              Mark all as read
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
       <FlatList
         data={notifications}
         keyExtractor={keyExtractor}
@@ -190,6 +131,24 @@ const NotificationsScreen = () => {
         ListEmptyComponent={ListEmptyComponent}
         showsVerticalScrollIndicator={false}
       />
+
+      {unreadCount > 0 && (
+        <TouchableOpacity
+          style={[
+            styles.fab,
+            {
+              backgroundColor: colors.primary,
+            },
+          ]}
+          activeOpacity={0.85}
+          onPress={markAllAsRead}
+        >
+          <Ionicons name="checkmark-done" size={18} color={colors.textWhite} />
+          <Text style={[styles.fabText, { color: colors.textWhite }]}>
+            Mark all as read
+          </Text>
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 };
@@ -198,87 +157,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SPACING.md,
-    paddingTop: SPACING.md,
-    paddingBottom: SPACING.sm,
-  },
-  screenTitle: {
-    fontSize: TYPOGRAPHY.fontSize.lg,
-    fontFamily: TYPOGRAPHY.fontFamily.semibold,
-  },
-  markAllText: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    fontFamily: TYPOGRAPHY.fontFamily.medium,
-  },
   listContent: {
     paddingHorizontal: SPACING.md,
     paddingTop: SPACING.sm,
     paddingBottom: SPACING.lg,
     gap: SPACING.sm,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-    borderRadius: SIZES.radius.lg,
-    backgroundColor: 'transparent',
-    ...SIZES.shadow.small,
-  },
-  rowUnread: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  rowPressed: {
-    opacity: 0.7,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: 'transparent',
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: SPACING.md,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.xs,
-  },
-  title: {
-    fontSize: TYPOGRAPHY.fontSize.md,
-    fontFamily: TYPOGRAPHY.fontFamily.regular,
-    marginRight: SPACING.xs,
-  },
-  titleUnread: {
-    fontFamily: TYPOGRAPHY.fontFamily.semibold,
-  },
-  unreadDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-  },
-  message: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    fontFamily: TYPOGRAPHY.fontFamily.regular,
-    lineHeight: TYPOGRAPHY.fontSize.sm * TYPOGRAPHY.lineHeight.normal,
-    marginBottom: SPACING.xs,
-  },
-  time: {
-    fontSize: TYPOGRAPHY.fontSize.xs,
-    fontFamily: TYPOGRAPHY.fontFamily.regular,
   },
   emptyState: {
     flex: 1,
@@ -304,6 +187,23 @@ const styles = StyleSheet.create({
     fontFamily: TYPOGRAPHY.fontFamily.regular,
     textAlign: 'center',
     paddingHorizontal: SPACING.xl,
+  },
+  fab: {
+    position: 'absolute',
+    right: SPACING.lg,
+    bottom: SPACING.xxxl,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: 999,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...SIZES.shadow.medium,
+  },
+  fabText: {
+    marginLeft: SPACING.xs,
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontFamily: TYPOGRAPHY.fontFamily.medium,
   },
 });
 
