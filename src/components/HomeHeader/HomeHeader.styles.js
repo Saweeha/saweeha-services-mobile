@@ -7,7 +7,7 @@ import { TYPOGRAPHY } from '../../constants/typography';
 export default StyleSheet.create({
   header: {
     paddingHorizontal: SPACING.md,
-    paddingTop: SPACING.lg,
+    paddingTop: SPACING.sm,
     paddingBottom: SPACING.lg,
     backgroundColor: COLORS.background,
   },
