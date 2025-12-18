@@ -1,21 +1,13 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { useNavigation } from '@react-navigation/native';
 
 // Components
 import PromotionSwiper from '../components/PromotionSwiper/PromotionSwiper';
 import CategoryCard from '../components/CategoryCard/CategoryCard';
 import BusinessCard from '../components/BusinessCard/BusinessCard';
+import HomeHeader from '../components/HomeHeader/HomeHeader';
 
 // Constants
 import { COLORS } from '../constants/colors';
@@ -24,8 +16,8 @@ import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   // Mock data - replace with API calls later
   const promotions = [
@@ -100,45 +92,14 @@ const HomeScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          {/* Top Row */}
-          <View style={styles.headerTop}>
-            <View style={styles.headerTitleContainer}>
-              <Text style={styles.headerTitle}>Discover</Text>
-            </View>
-            <TouchableOpacity style={styles.notificationButton}>
-              <Ionicons name="notifications-outline" size={24} color={COLORS.text} />
-              <View style={styles.notificationBadge} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Search Bar */}
-          <View style={styles.searchContainer}>
-            <View style={[styles.searchBar, isSearchFocused && styles.searchBarFocused]}>
-              <Ionicons
-                name="search"
-                size={20}
-                color={isSearchFocused ? COLORS.primary : COLORS.textLight}
-                style={styles.searchIcon}
-              />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search services..."
-                placeholderTextColor={COLORS.textLight}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchQuery('')}>
-                  <Ionicons name="close" size={18} color={COLORS.textLight} />
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-        </View>
+        <HomeHeader
+          title="Discover"
+          searchQuery={searchQuery}
+          onChangeSearchQuery={setSearchQuery}
+          onPressNotifications={() => {
+            navigation.navigate('Notifications');
+          }}
+        />
 
         {/* Promotions Section */}
         <View style={styles.section}>
@@ -225,75 +186,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: SIZES.tabBarHeight + SPACING.lg,
-  },
-  header: {
-    paddingHorizontal: SPACING.md,
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.lg,
-    backgroundColor: COLORS.background,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.lg,
-  },
-  headerTitleContainer: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: TYPOGRAPHY.fontSize.display,
-    fontFamily: TYPOGRAPHY.fontFamily.semibold,
-    color: COLORS.text,
-    letterSpacing: -1,
-  },
-  notificationButton: {
-    position: 'relative',
-    width: 44,
-    height: 44,
-    borderRadius: SIZES.radius.md,
-    backgroundColor: COLORS.backgroundLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...SIZES.shadow.small,
-  },
-  notificationBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.error,
-  },
-  searchContainer: {
-    marginTop: 0,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.backgroundLight,
-    borderRadius: SIZES.radius.lg,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.md,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    ...SIZES.shadow.small,
-  },
-  searchBarFocused: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.purple50,
-    ...SIZES.shadow.medium,
-  },
-  searchIcon: {
-    marginRight: SPACING.sm,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: TYPOGRAPHY.fontSize.md,
-    fontFamily: TYPOGRAPHY.fontFamily.regular,
-    color: COLORS.text,
-    paddingVertical: 0,
   },
   section: {
     marginBottom: SPACING.md,
