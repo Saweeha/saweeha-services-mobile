@@ -8,6 +8,7 @@ const CARD_WIDTH = width - SPACING.md * 2;
 const createPromotionSwiperStyles = (colors, isDark = false) => StyleSheet.create({
   container: {
     marginBottom: SPACING.md,
+    ...SIZES.shadow.medium,
   },
   pagerView: {
     width: width,

@@ -9,18 +9,28 @@ const CARD_WIDTH = width * 0.75; // 75% of screen width for horizontal scroll
 const createBusinessCardStyles = (colors) => StyleSheet.create({
   container: {
     width: CARD_WIDTH,
-    backgroundColor: colors.backgroundLight,
-    borderRadius: SIZES.radius.md,
-    overflow: 'hidden',
-    ...SIZES.shadow.small,
+    ...SIZES.shadow.medium,
   },
   image: {
     width: '100%',
     height: 180,
     backgroundColor: colors.border,
+    borderRadius: SIZES.radius.lg,
+  },
+  ratingContainer: {
+    position: 'absolute',
+    top: SPACING.sm,
+    right: SPACING.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.xs,
+    paddingVertical: SPACING.xs,
+    borderRadius: SIZES.radius.sm,
+    overflow: 'hidden',
   },
   content: {
-    padding: SPACING.md,
+    paddingHorizontal: SPACING.xs,
+    paddingVertical: SPACING.sm,
   },
   name: {
     fontSize: TYPOGRAPHY.fontSize.lg,
@@ -33,15 +43,6 @@ const createBusinessCardStyles = (colors) => StyleSheet.create({
     fontFamily: TYPOGRAPHY.fontFamily.regular,
     color: colors.textLight,
     marginBottom: SPACING.sm,
-  },
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   rating: {
     fontSize: TYPOGRAPHY.fontSize.sm,

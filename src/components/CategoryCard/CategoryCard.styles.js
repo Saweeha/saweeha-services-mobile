@@ -16,7 +16,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: SPACING.md,
-    ...SIZES.shadow.small,
+    ...SIZES.shadow.medium,
   },
   iconContainer: {
     marginRight: SPACING.md,
