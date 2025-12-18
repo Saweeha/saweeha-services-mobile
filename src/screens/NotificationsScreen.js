@@ -105,23 +105,23 @@ const NotificationsScreen = () => {
           pressed && styles.rowPressed,
         ]}
       >
-        {/* Icon */}
-        <View
-          style={[
-            styles.iconContainer,
+            {/* Icon */}
+            <View
+              style={[
+                styles.iconContainer,
             { backgroundColor: typeConfig.iconBg || COLORS.indigo100 },
-          ]}
-        >
-          <Ionicons
+              ]}
+            >
+              <Ionicons
             name={typeConfig.icon || 'notifications-outline'}
             size={22}
             color={typeConfig.iconColor || COLORS.primary}
-          />
-        </View>
+              />
+            </View>
 
-        {/* Content */}
-        <View style={styles.textContainer}>
-          <View style={styles.titleRow}>
+            {/* Content */}
+            <View style={styles.textContainer}>
+              <View style={styles.titleRow}>
             <Text
               style={[
                 styles.title,
@@ -129,16 +129,16 @@ const NotificationsScreen = () => {
               ]}
               numberOfLines={1}
             >
-              {notification.title}
-            </Text>
-            {!notification.isRead && <View style={styles.unreadDot} />}
-          </View>
+                  {notification.title}
+                </Text>
+                {!notification.isRead && <View style={styles.unreadDot} />}
+              </View>
           <Text style={styles.message} numberOfLines={2}>
-            {notification.message}
-          </Text>
+                {notification.message}
+              </Text>
           <Text style={styles.time}>{formatTime(notification.time)}</Text>
-        </View>
-      </Pressable>
+          </View>
+        </Pressable>
     );
   };
 
@@ -149,19 +149,19 @@ const NotificationsScreen = () => {
   const keyExtractor = (item) => item.id;
 
   const ListEmptyComponent = () => (
-    <View style={styles.emptyState}>
-      <View style={styles.emptyIconContainer}>
-        <Ionicons
-          name="notifications-off-outline"
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIconContainer}>
+              <Ionicons
+                name="notifications-off-outline"
           size={56}
-          color={COLORS.textLight}
-        />
-      </View>
+                color={COLORS.textLight}
+              />
+            </View>
       <Text style={styles.emptyTitle}>No notifications</Text>
-      <Text style={styles.emptyMessage}>
+            <Text style={styles.emptyMessage}>
         You're all caught up. We'll let you know when there&apos;s something new.
-      </Text>
-    </View>
+            </Text>
+          </View>
   );
 
   return (
@@ -180,7 +180,6 @@ const NotificationsScreen = () => {
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={ListEmptyComponent}
         showsVerticalScrollIndicator={false}
       />
@@ -213,17 +212,23 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.sm,
+    paddingBottom: SPACING.lg,
     gap: SPACING.sm,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingVertical: SPACING.sm,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    borderRadius: SIZES.radius.lg,
+    backgroundColor: COLORS.backgroundLight,
+    ...SIZES.shadow.small,
   },
   rowUnread: {
-    backgroundColor: COLORS.purple100,
-    borderRadius: SIZES.radius.md,
-    paddingHorizontal: SPACING.sm,
+    backgroundColor: COLORS.purple50,
+    borderWidth: 1,
+    borderColor: COLORS.borderPurple,
   },
   rowPressed: {
     opacity: 0.7,
