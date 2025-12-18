@@ -13,7 +13,6 @@ export default StyleSheet.create({
     backgroundColor: COLORS.backgroundLight,
     borderRadius: SIZES.radius.md,
     overflow: 'hidden',
-    marginRight: SPACING.md,
     ...SIZES.shadow.small,
   },
   image: {

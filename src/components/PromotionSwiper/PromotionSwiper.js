@@ -1,35 +1,41 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   View,
-  ScrollView,
   Image,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import PagerView from 'react-native-pager-view';
 import styles from './PromotionSwiper.styles';
 import { COLORS } from '../../constants/colors';
-import { SPACING } from '../../constants/spacing';
-
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = width - SPACING.md * 2;
 
 const PromotionSwiper = React.memo(({ promotions = [], onPress }) => {
-  const scrollViewRef = useRef(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const pagerRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(0);
 
-  const handleScroll = (event) => {
-    const scrollPosition = event.nativeEvent.contentOffset.x;
-    const index = Math.round(scrollPosition / CARD_WIDTH);
-    setCurrentIndex(index);
-  };
+  // Auto-play: advance slide every 4 seconds
+  useEffect(() => {
+    if (!promotions || promotions.length <= 1) {
+      return undefined;
+    }
 
-  const scrollToIndex = (index) => {
-    scrollViewRef.current?.scrollTo({
-      x: index * CARD_WIDTH,
-      animated: true,
-    });
+    const intervalId = setInterval(() => {
+      setCurrentPage((prevPage) => {
+        const nextPage = (prevPage + 1) % promotions.length;
+        pagerRef.current?.setPage(nextPage);
+        return nextPage;
+      });
+    }, 4000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [promotions.length]);
+
+  const handlePageSelected = (e) => {
+    setCurrentPage(e.nativeEvent.position);
   };
 
   if (!promotions || promotions.length === 0) {
@@ -38,50 +44,52 @@ const PromotionSwiper = React.memo(({ promotions = [], onPress }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        ref={scrollViewRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        style={styles.scrollView}
+      <PagerView
+        ref={pagerRef}
+        style={styles.pagerView}
+        initialPage={0}
+        onPageSelected={handlePageSelected}
+        autoplay={true}
+        autoplayInterval={4000}
+        loop={true}
       >
         {promotions.map((promotion, index) => (
-          <TouchableOpacity
-            key={promotion.id || index}
-            style={styles.card}
-            onPress={() => onPress?.(promotion)}
-            activeOpacity={0.9}
-          >
-            {promotion.image ? (
-              <Image
-                source={promotion.image}
-                style={styles.image}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={styles.placeholder}>
-                <Ionicons name="image-outline" size={48} color={COLORS.textLight} />
-              </View>
-            )}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* Pagination Dots */}
-      {promotions.length > 1 && (
-        <View style={styles.pagination}>
-          {promotions.map((_, index) => (
+          <View key={promotion.id || index} style={styles.page}>
             <TouchableOpacity
-              key={index}
-              style={[
-                styles.paginationDot,
-                index === currentIndex && styles.paginationDotActive,
-              ]}
-              onPress={() => scrollToIndex(index)}
-            />
-          ))}
+              style={styles.card}
+              onPress={() => onPress?.(promotion)}
+              activeOpacity={0.9}
+            >
+              {promotion.image ? (
+                <Image
+                  source={promotion.image}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={styles.placeholder}>
+                  <Ionicons name="image-outline" size={48} color={COLORS.textLight} />
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+        ))}
+      </PagerView>
+      {promotions.length > 1 && (
+        <View style={styles.paginationContainer}>
+          <BlurView intensity={80} tint="light" style={styles.paginationBlur}>
+            <View style={styles.pagination}>
+              {promotions.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.paginationDot,
+                    index === currentPage && styles.paginationDotActive,
+                  ]}
+                />
+              ))}
+            </View>
+          </BlurView>
         </View>
       )}
     </View>

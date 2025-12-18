@@ -112,12 +112,6 @@ const HomeScreen = () => {
 
         {/* Promotions Section */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Special Promotions</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAll}>See All</Text>
-            </TouchableOpacity>
-          </View>
           <PromotionSwiper
             promotions={promotions}
             onPress={(promotion) => console.log('Promotion pressed:', promotion.id)}
@@ -198,13 +192,13 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: SPACING.md,
-    paddingHorizontal: SPACING.md,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.md,
+    paddingHorizontal: SPACING.md,
   },
   sectionTitle: {
     fontSize: TYPOGRAPHY.fontSize.xl,
@@ -220,10 +214,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    paddingHorizontal: SPACING.md,
   },
   businessesList: {
-    paddingRight: SPACING.md,
-    paddingBottom: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    gap: SPACING.md,
   },
 });
 

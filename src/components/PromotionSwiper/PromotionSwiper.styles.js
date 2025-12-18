@@ -10,13 +10,18 @@ export default StyleSheet.create({
   container: {
     marginBottom: SPACING.md,
   },
-  scrollView: {
-    marginHorizontal: -SPACING.md,
+  pagerView: {
+    width: width,
+    height: 180,
+  },
+  page: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.md,
   },
   card: {
     width: CARD_WIDTH,
-    height: 200,
-    marginHorizontal: SPACING.md,
+    height: "100%",
     borderRadius: SIZES.radius.lg,
     overflow: 'hidden',
     ...SIZES.shadow.medium,
@@ -26,31 +31,38 @@ export default StyleSheet.create({
     height: '100%',
     borderRadius: SIZES.radius.lg,
   },
-  placeholder: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: COLORS.purple100,
-    justifyContent: 'center',
+  paginationContainer: {
+    position: 'absolute',
+    bottom: SPACING.sm,
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    borderRadius: SIZES.radius.lg,
+  },
+  paginationBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   pagination: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: SPACING.md,
-    paddingHorizontal: SPACING.md,
+    gap: SPACING.xs,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
   },
   paginationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.border,
-    marginHorizontal: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.textWhite,
+    opacity: 0.5,
   },
   paginationDotActive: {
     width: 24,
-    backgroundColor: COLORS.primary,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.textWhite,
+    opacity: 1,
   },
 });
 
