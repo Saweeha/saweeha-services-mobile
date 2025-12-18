@@ -61,7 +61,7 @@ const createPromotionSwiperStyles = (colors, isDark = false) => StyleSheet.creat
     width: 24,
     height: 6,
     borderRadius: 3,
-    backgroundColor: isDark ? colors.primaryLight : colors.textWhite,
+    backgroundColor: colors.primaryLight,
     opacity: 1,
   },
 });
