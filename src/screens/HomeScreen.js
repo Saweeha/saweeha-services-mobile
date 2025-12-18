@@ -23,15 +23,19 @@ const HomeScreen = () => {
   const promotions = [
     {
       id: '1',
-      image: null, // Placeholder - replace with actual image source
+      image: require('../../assets/promo/promo-1.jpg'),
     },
     {
       id: '2',
-      image: null, // Placeholder - replace with actual image source
+      image: require('../../assets/promo/promo-2.jpg'),
     },
     {
       id: '3',
-      image: null, // Placeholder - replace with actual image source
+      image: require('../../assets/promo/promo-3.jpg'),
+    },
+    {
+      id: '4',
+      image: require('../../assets/promo/promo-4.jpg'),
     },
   ];
 
@@ -51,6 +55,7 @@ const HomeScreen = () => {
       category: 'Beauty & Spa',
       rating: 4.8,
       distance: '2.5 km',
+      image: require('../../assets/businesses/pexels-delbeautybox-211032-705255.jpg'),
     },
     {
       id: '2',
@@ -58,6 +63,7 @@ const HomeScreen = () => {
       category: 'Fitness',
       rating: 4.6,
       distance: '1.2 km',
+      image: require('../../assets/businesses/pexels-thgusstavo-1813272.jpg'),
     },
     {
       id: '3',
@@ -65,6 +71,7 @@ const HomeScreen = () => {
       category: 'Wellness',
       rating: 4.9,
       distance: '3.8 km',
+      image: require('../../assets/businesses/pexels-element5-973402.jpg'),
     },
     {
       id: '4',
@@ -72,6 +79,7 @@ const HomeScreen = () => {
       category: 'Food & Dining',
       rating: 4.7,
       distance: '0.8 km',
+      image: require('../../assets/businesses/pexels-cottonbro-3992874.jpg'),
     },
   ];
 
@@ -81,6 +89,7 @@ const HomeScreen = () => {
       category={item.category}
       rating={item.rating}
       distance={item.distance}
+      image={item.image}
       onPress={() => console.log('Business pressed:', item.id)}
     />
   );
