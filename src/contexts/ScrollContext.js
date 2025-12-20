@@ -1,46 +1,59 @@
-import React, { createContext, useContext, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { Animated } from 'react-native';
 
-const ScrollContext = createContext(null);
+const ScrollChannelContext = createContext(null);
 
-export const useScrollContext = () => {
-  const context = useContext(ScrollContext);
+/**
+ * Scroll channel structure:
+ * {
+ *   scrollY: Animated.Value,
+ *   isCollapsed: Animated.Value (derived from scrollY > threshold, returns 0 or 1)
+ * }
+ */
+
+export const useScrollChannelContext = () => {
+  const context = useContext(ScrollChannelContext);
   if (!context) {
     // Return a no-op context if not available (for screens that don't need it)
     return {
-      getScrollY: () => new Animated.Value(0),
-      registerScrollY: () => {},
+      activeScrollChannel: null,
+      setActiveScrollChannel: () => {},
+      clearActiveScrollChannel: () => {},
     };
   }
   return context;
 };
 
-export const ScrollProvider = ({ children }) => {
-  const scrollYRefs = useRef({});
+// Legacy export for backward compatibility during migration
+export const useScrollContext = () => {
+  console.warn('useScrollContext is deprecated. Use useScrollChannelContext instead.');
+  return useScrollChannelContext();
+};
 
-  const getScrollY = useCallback((screenName) => {
-    // If not registered yet, create a new one (header might render before screen)
-    // Screen's registerScrollY will replace it with the actual scrollY instance
-    if (!scrollYRefs.current[screenName]) {
-      scrollYRefs.current[screenName] = new Animated.Value(0);
-    }
-    return scrollYRefs.current[screenName];
+export const ScrollChannelProvider = ({ children }) => {
+  const [activeScrollChannel, setActiveScrollChannelState] = useState(null);
+
+  const setActiveScrollChannel = useCallback((channel) => {
+    setActiveScrollChannelState(channel);
   }, []);
 
-  const registerScrollY = useCallback((screenName, scrollY) => {
-    // Replace the placeholder with the actual scrollY from the screen
-    scrollYRefs.current[screenName] = scrollY;
+  const clearActiveScrollChannel = useCallback(() => {
+    setActiveScrollChannelState(null);
   }, []);
 
   const value = {
-    getScrollY,
-    registerScrollY,
+    activeScrollChannel,
+    setActiveScrollChannel,
+    clearActiveScrollChannel,
   };
 
   return (
-    <ScrollContext.Provider value={value}>
+    <ScrollChannelContext.Provider value={value}>
       {children}
-    </ScrollContext.Provider>
+    </ScrollChannelContext.Provider>
   );
 };
+
+// Legacy export for backward compatibility during migration
+export const ScrollProvider = ScrollChannelProvider;
 

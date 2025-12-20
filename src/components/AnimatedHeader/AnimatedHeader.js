@@ -5,19 +5,21 @@ import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../hooks/useTheme';
-import { useScrollContext } from '../../contexts/ScrollContext';
+import { useScrollChannelContext } from '../../contexts/ScrollContext';
 import CustomHeader from '../CustomHeader/CustomHeader';
 import { SPACING } from '../../constants/spacing';
 import { SIZES } from '../../constants/sizes';
 
-const AnimatedHeader = ({ title, onBackPress, showBackButton, rightComponent, screenName, threshold = 100 }) => {
+const AnimatedHeader = ({ title, onBackPress, showBackButton, rightComponent, threshold = 100 }) => {
   const { scheme, colors } = useTheme();
-  const { getScrollY } = useScrollContext();
+  const { activeScrollChannel } = useScrollChannelContext();
   const insets = useSafeAreaInsets();
   const isDark = scheme === 'dark';
 
-  const scrollY = getScrollY(screenName);
+  // Gracefully handle null (no scroll channel active)
+  const scrollY = activeScrollChannel?.scrollY || new Animated.Value(0);
 
+  // Header animations based on scroll threshold
   const headerOpacity = scrollY.interpolate({
     inputRange: [threshold, threshold + 50],
     outputRange: [0, 1],
@@ -30,7 +32,8 @@ const AnimatedHeader = ({ title, onBackPress, showBackButton, rightComponent, sc
     extrapolate: 'clamp',
   });
 
-  // Floating back button opacity (inverse of header opacity)
+  // Floating back button - driven by explicit scroll thresholds (not inverse opacity)
+  // Shows when scrolled past threshold (collapsed state)
   const floatingBackButtonOpacity = scrollY.interpolate({
     inputRange: [threshold, threshold + 50],
     outputRange: [1, 0],
@@ -132,7 +135,6 @@ AnimatedHeader.propTypes = {
   onBackPress: PropTypes.func,
   showBackButton: PropTypes.bool,
   rightComponent: PropTypes.node,
-  screenName: PropTypes.string.isRequired,
   threshold: PropTypes.number,
 };
 

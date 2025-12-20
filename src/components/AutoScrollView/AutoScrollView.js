@@ -1,30 +1,55 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { Animated } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { useScrollContext } from '../../contexts/ScrollContext';
+import { useFocusEffect } from '@react-navigation/native';
+import { useScrollChannelContext } from '../../contexts/ScrollContext';
 
 /**
  * AutoScrollView - Automatically registers scroll position for animated headers
  * Screens can use this instead of Animated.ScrollView with zero config
- * If screenName is not provided, it automatically detects from route
+ * 
+ * This component:
+ * - Creates its own scrollY animated value
+ * - Detects focus using useFocusEffect
+ * - Registers itself as the active scroll channel ON FOCUS
+ * - Unregisters ON BLUR / UNMOUNT
+ * 
+ * It does NOT:
+ * - Know anything about headers
+ * - Reference navigation options
+ * - Reference route names
  */
-const AutoScrollView = ({ screenName, children, onScroll, ...props }) => {
-  const route = useRoute();
-  const { registerScrollY } = useScrollContext();
+const AutoScrollView = ({ children, onScroll, threshold = 100, ...props }) => {
+  const { setActiveScrollChannel, clearActiveScrollChannel } = useScrollChannelContext();
   const scrollY = useRef(new Animated.Value(0)).current;
-  
-  // Auto-detect screen name from route if not provided
-  const actualScreenName = screenName || route?.name;
 
-  useEffect(() => {
-    if (actualScreenName && registerScrollY) {
-      registerScrollY(actualScreenName, scrollY);
+  // Create scroll channel with scrollY and derived isCollapsed value
+  const scrollChannel = useMemo(() => {
+    // isCollapsed: 0 when scrollY < threshold, 1 when scrollY >= threshold
+    const isCollapsed = scrollY.interpolate({
+      inputRange: [0, threshold, threshold + 1],
+      outputRange: [0, 0, 1],
+      extrapolate: 'clamp',
+    });
+    return {
+      scrollY,
+      isCollapsed,
+    };
+  }, [scrollY, threshold]);
+
+  // Register/unregister on focus/blur
+  useFocusEffect(
+    React.useCallback(() => {
+      // Register as active channel when screen gains focus
+      setActiveScrollChannel(scrollChannel);
+
       return () => {
+        // Clear active channel when screen loses focus
+        clearActiveScrollChannel();
+        // Reset scroll position
         scrollY.setValue(0);
       };
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actualScreenName]);
+    }, [scrollChannel, setActiveScrollChannel, clearActiveScrollChannel, scrollY])
+  );
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],

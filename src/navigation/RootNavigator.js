@@ -3,47 +3,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TabNavigator from './TabNavigator';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import BusinessScreen from '../screens/BusinessScreen';
-import CustomHeader from '../components/CustomHeader/CustomHeader';
-import AnimatedHeader from '../components/AnimatedHeader/AnimatedHeader';
+import { getHeaderOptions } from './headerConfig';
 
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
   return (
     <Stack.Navigator
-      screenOptions={({ navigation, route }) => {
-        // Check if this screen needs an animated header
-        const needsAnimatedHeader = route.name === 'Business';
-        
-        return {
-          headerShown: true,
-          headerTransparent: needsAnimatedHeader,
-          header: ({ options }) => {
-            if (needsAnimatedHeader) {
-              return (
-                <AnimatedHeader
-                  screenName={route.name}
-                  title={options.title || route.name}
-                  onBackPress={navigation.canGoBack() ? () => navigation.goBack() : undefined}
-                  showBackButton={navigation.canGoBack()}
-                  rightComponent={options.headerRight}
-                  threshold={100}
-                />
-              );
-            }
-            
-            return (
-              <CustomHeader
-                title={options.title || route.name}
-                onBackPress={navigation.canGoBack() ? () => navigation.goBack() : undefined}
-                showBackButton={navigation.canGoBack()}
-                rightComponent={options.headerRight}
-              />
-            );
-          },
-          headerShadowVisible: false,
-        };
-      }}
+      screenOptions={({ navigation, route }) => getHeaderOptions(navigation, route)}
     >
       <Stack.Screen 
         name="MainTabs" 
@@ -60,11 +27,10 @@ const RootNavigator = () => {
       <Stack.Screen 
         name="Business" 
         component={BusinessScreen}
-        options={({ route }) => {
-          const businessName = route.params?.business?.name || 'Business';
-          return {
-            title: businessName,
-          };
+        options={{
+          // Title is read dynamically from route.params in headerConfig
+          // This ensures reactive updates when route params change
+          title: 'Business',
         }}
       />
     </Stack.Navigator>

@@ -90,14 +90,8 @@ const BusinessScreen = () => {
     };
   }, [routeBusiness]);
 
-  // Update navigation header title when business name is available
-  useEffect(() => {
-    if (business.name) {
-      navigation.setOptions({
-        title: business.name,
-      });
-    }
-  }, [business.name, navigation]);
+  // Note: Header title is now managed entirely by navigation via route params
+  // No screen-level header configuration allowed per design constraints
 
   const tabs = [
     { id: 'services', label: 'Services' },
