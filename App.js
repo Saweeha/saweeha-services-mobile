@@ -12,6 +12,7 @@ import {
 } from '@expo-google-fonts/inter';
 import RootNavigator from './src/navigation/RootNavigator';
 import { ThemeProvider, useTheme } from './src/hooks/useTheme';
+import { ScrollProvider } from './src/contexts/ScrollContext';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -50,7 +51,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <AppContent />
+        <ScrollProvider>
+          <AppContent />
+        </ScrollProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

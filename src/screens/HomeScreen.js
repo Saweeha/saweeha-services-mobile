@@ -91,7 +91,7 @@ const HomeScreen = () => {
       rating={item.rating}
       distance={item.distance}
       image={item.image}
-      onPress={() => console.log('Business pressed:', item.id)}
+      onPress={() => navigation.navigate('Business', { business: item })}
     />
   );
 
