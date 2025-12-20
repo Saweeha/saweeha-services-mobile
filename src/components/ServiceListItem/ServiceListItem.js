@@ -7,7 +7,7 @@ import { SPACING } from '../../constants/spacing';
 import { SIZES } from '../../constants/sizes';
 
 const ServiceListItem = React.memo(
-  ({ title, duration, price, description, isSelected, onPress }) => {
+  ({ title, duration, price, description, isSelected, selectedProfessional, onPress, onLongPress }) => {
     const { colors } = useTheme();
 
     return (
@@ -21,6 +21,7 @@ const ServiceListItem = React.memo(
           },
         ]}
         onPress={onPress}
+        onLongPress={onLongPress}
         activeOpacity={0.7}
       >
         <View style={styles.content}>
@@ -52,6 +53,15 @@ const ServiceListItem = React.memo(
             </Text>
           )}
 
+          {isSelected && selectedProfessional && (
+            <View style={[styles.professionalBadge, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name="person" size={14} color={colors.primary} />
+              <Text style={[styles.professionalText, { color: colors.primary }]} numberOfLines={1}>
+                {selectedProfessional.name}
+              </Text>
+            </View>
+          )}
+
           <View style={styles.footer}>
             <View style={styles.metaInfo}>
               <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
@@ -73,7 +83,13 @@ ServiceListItem.propTypes = {
   price: PropTypes.string.isRequired,
   description: PropTypes.string,
   isSelected: PropTypes.bool,
+  selectedProfessional: PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    role: PropTypes.string,
+  }),
   onPress: PropTypes.func,
+  onLongPress: PropTypes.func,
 };
 
 const styles = StyleSheet.create({
@@ -126,6 +142,21 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
     fontWeight: '700',
+  },
+  professionalBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs / 2,
+    borderRadius: SIZES.radius.sm,
+    gap: SPACING.xs / 2,
+    marginTop: SPACING.xs / 2,
+  },
+  professionalText: {
+    fontSize: 12,
+    fontWeight: '600',
+    maxWidth: 150,
   },
 });
 

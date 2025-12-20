@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -15,6 +15,9 @@ import TeamMemberCard from '../components/TeamMemberCard/TeamMemberCard';
 import ReviewListItem from '../components/ReviewListItem/ReviewListItem';
 import InfoCard from '../components/InfoCard/InfoCard';
 import ServiceCategoryFilter from '../components/ServiceCategoryFilter/ServiceCategoryFilter';
+import ProfessionalSelectionModal from '../components/ProfessionalSelectionModal/ProfessionalSelectionModal';
+import ContinueButton from '../components/ContinueButton/ContinueButton';
+import FloatingContinueButton from '../components/FloatingContinueButton/FloatingContinueButton';
 
 // Constants & Hooks
 import { SPACING } from '../constants/spacing';
@@ -27,6 +30,9 @@ const BusinessScreen = () => {
   const [activeTab, setActiveTab] = useState('services');
   const [selectedServices, setSelectedServices] = useState([]);
   const [activeServiceCategory, setActiveServiceCategory] = useState('all');
+  const [professionalModalVisible, setProfessionalModalVisible] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [isAtBottom, setIsAtBottom] = useState(false);
 
   // Get business data from route params or use mock data
   const routeBusiness = route.params?.business;
@@ -275,15 +281,91 @@ const BusinessScreen = () => {
     },
   ];
 
-  // Handle service selection
-  const handleServiceToggle = (service) => {
-    setSelectedServices(prev => {
-      const exists = prev.find(s => s.id === service.id);
-      if (exists) {
-        return prev.filter(s => s.id !== service.id);
-      }
-      return [...prev, service];
+  // Map service categories to professional specialties
+  const getMatchingSpecialties = (serviceCategory) => {
+    const categoryMap = {
+      haircare: ['Haircuts', 'Styling', 'Beard Grooming', 'Classic Cuts', 'Coloring'],
+      facial: ['Facial', 'Skincare', 'Makeup'],
+      nailcare: ['Manicure', 'Pedicure', 'Nail Art'],
+      packages: ['Haircuts', 'Styling', 'Beard Grooming', 'Classic Cuts', 'Facial', 'Skincare', 'Manicure', 'Pedicure'],
+    };
+    return categoryMap[serviceCategory] || [];
+  };
+
+  // Filter professionals based on service category
+  const getAvailableProfessionals = (service) => {
+    if (!service) return [];
+    
+    const matchingSpecialties = getMatchingSpecialties(service.category);
+    
+    return mockTeam.filter(professional => {
+      return professional.specialties.some(specialty =>
+        matchingSpecialties.some(match => 
+          specialty.toLowerCase().includes(match.toLowerCase()) ||
+          match.toLowerCase().includes(specialty.toLowerCase())
+        )
+      );
     });
+  };
+
+  // Handle service press - open professional selection modal or unselect if already selected
+  const handleServicePress = (service) => {
+    const existingService = selectedServices.find(s => s.id === service.id);
+    
+    if (existingService) {
+      // If service is already selected, unselect it
+      setSelectedServices(prev => prev.filter(s => s.id !== service.id));
+    } else {
+      // If service is not selected, open modal to select professional
+      setSelectedService(service);
+      setProfessionalModalVisible(true);
+    }
+  };
+
+  // Handle long press - allow changing professional for already selected service
+  const handleServiceLongPress = (service) => {
+    const existingService = selectedServices.find(s => s.id === service.id);
+    
+    if (existingService) {
+      // Open modal to change professional
+      setSelectedService(service);
+      setProfessionalModalVisible(true);
+    }
+  };
+
+  // Handle professional selection
+  const handleProfessionalSelection = (professional) => {
+    if (!selectedService) return;
+
+    const serviceWithProfessional = {
+      ...selectedService,
+      selectedProfessional: professional,
+    };
+
+    setSelectedServices(prev => {
+      const exists = prev.find(s => s.id === selectedService.id);
+      if (exists) {
+        return prev.map(s => 
+          s.id === selectedService.id ? serviceWithProfessional : s
+        );
+      }
+      return [...prev, serviceWithProfessional];
+    });
+  };
+
+  // Handle scroll to detect if at bottom
+  const handleScroll = useCallback((event) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const paddingToBottom = 100; // Threshold for "at bottom"
+    const isBottom = 
+      layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+    setIsAtBottom(isBottom);
+  }, []);
+
+  // Handle continue button press
+  const handleContinue = () => {
+    // TODO: Navigate to booking/checkout screen
+    console.log('Continue with selected services:', selectedServices);
   };
 
   const renderContent = () => {
@@ -296,17 +378,22 @@ const BusinessScreen = () => {
               activeCategory={activeServiceCategory}
               onCategoryChange={setActiveServiceCategory}
             />
-            {filteredServices.map((service) => (
+            {filteredServices.map((service) => {
+              const selectedServiceData = selectedServices.find(s => s.id === service.id);
+              return (
               <ServiceListItem
                 key={service.id}
                 title={service.title}
                 duration={service.duration}
                 price={service.price}
                 description={service.description}
-                isSelected={selectedServices.some(s => s.id === service.id)}
-                onPress={() => handleServiceToggle(service)}
+                  isSelected={!!selectedServiceData}
+                  selectedProfessional={selectedServiceData?.selectedProfessional}
+                  onPress={() => handleServicePress(service)}
+                  onLongPress={() => handleServiceLongPress(service)}
               />
-            ))}
+              );
+            })}
           </View>
         );
 
@@ -377,6 +464,7 @@ const BusinessScreen = () => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
       >
         <BusinessHero images={business.images} />
         
@@ -394,7 +482,42 @@ const BusinessScreen = () => {
         />
 
         {renderContent()}
+        
+        {/* Relative Continue Button at bottom of content */}
+        {selectedServices.length > 0 && (
+          <View style={styles.bottomButtonContainer}>
+            <ContinueButton
+              label="Continue"
+              onPress={handleContinue}
+              count={selectedServices.length}
+            />
+          </View>
+        )}
       </AutoScrollView>
+
+      <ProfessionalSelectionModal
+        visible={professionalModalVisible}
+        service={selectedService}
+        professionals={selectedService ? getAvailableProfessionals(selectedService) : []}
+        currentProfessional={
+          selectedService
+            ? selectedServices.find(s => s.id === selectedService.id)?.selectedProfessional
+            : null
+        }
+        onClose={() => {
+          setProfessionalModalVisible(false);
+          setSelectedService(null);
+        }}
+        onSelectProfessional={handleProfessionalSelection}
+      />
+
+      {/* Floating Continue Button */}
+      <FloatingContinueButton
+        visible={selectedServices.length > 0 && !isAtBottom}
+        onPress={handleContinue}
+        count={selectedServices.length}
+        label="Continue"
+      />
     </SafeAreaView>
   );
 };
@@ -408,6 +531,11 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: SPACING.xxl,
+  },
+  bottomButtonContainer: {
+    paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.md,
   },
   tabContent: {
     padding: SPACING.md,
