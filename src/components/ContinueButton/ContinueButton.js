@@ -12,6 +12,7 @@ const ContinueButton = React.memo(({
   disabled = false,
   count,
   style,
+  icon,
 }) => {
   const { colors } = useTheme();
 
@@ -40,7 +41,7 @@ const ContinueButton = React.memo(({
         <Text style={[styles.label, { color: colors.textWhite }]}>
           {label}
         </Text>
-        <Ionicons name="arrow-forward" size={20} color={colors.textWhite} />
+        {icon && <Ionicons name={icon} size={20} color={colors.textWhite} />}
       </View>
     </TouchableOpacity>
   );
@@ -52,6 +53,7 @@ ContinueButton.propTypes = {
   disabled: PropTypes.bool,
   count: PropTypes.number,
   style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  icon: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

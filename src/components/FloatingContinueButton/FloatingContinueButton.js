@@ -12,6 +12,7 @@ const FloatingContinueButton = React.memo(({
   onPress, 
   count,
   label = 'Continue',
+  icon,
 }) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -70,6 +71,7 @@ const FloatingContinueButton = React.memo(({
             onPress={onPress}
             count={count}
             style={styles.button}
+            icon={icon}
           />
         </View>
       </View>
@@ -82,6 +84,7 @@ FloatingContinueButton.propTypes = {
   onPress: PropTypes.func.isRequired,
   count: PropTypes.number,
   label: PropTypes.string,
+  icon: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

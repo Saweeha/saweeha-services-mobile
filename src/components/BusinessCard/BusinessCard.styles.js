@@ -5,15 +5,24 @@ import { TYPOGRAPHY } from '../../constants/typography';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.75; // 75% of screen width for horizontal scroll
+const DEFAULT_IMAGE_HEIGHT = 180; // Default height for horizontal scroll cards
+const GRID_IMAGE_ASPECT_RATIO = 0.75; // Height/Width ratio for grid cards
 
-const createBusinessCardStyles = (colors) => StyleSheet.create({
+const createBusinessCardStyles = (colors, customWidth) => {
+  const cardWidth = customWidth || CARD_WIDTH;
+  const isGridLayout = customWidth && customWidth < width * 0.5;
+  const imageHeight = isGridLayout 
+    ? cardWidth * GRID_IMAGE_ASPECT_RATIO 
+    : DEFAULT_IMAGE_HEIGHT;
+
+  return StyleSheet.create({
   container: {
-    width: CARD_WIDTH,
+      width: cardWidth,
     ...SIZES.shadow.medium,
   },
   image: {
     width: '100%',
-    height: 180,
+      height: imageHeight,
     backgroundColor: colors.border,
     borderRadius: SIZES.radius.lg,
   },
@@ -61,6 +70,7 @@ const createBusinessCardStyles = (colors) => StyleSheet.create({
     marginLeft: SPACING.xs,
   },
 });
+};
 
 export default createBusinessCardStyles;
 

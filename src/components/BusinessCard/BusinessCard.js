@@ -6,9 +6,9 @@ import { Ionicons } from '@expo/vector-icons';
 import createStyles from './BusinessCard.styles';
 import { useTheme } from '../../hooks/useTheme';
 
-const BusinessCard = React.memo(({ name, category, rating, distance, image, onPress }) => {
+const BusinessCard = React.memo(({ name, category, rating, distance, image, onPress, cardWidth }) => {
   const { colors, scheme } = useTheme();
-  const styles = createStyles(colors);
+  const styles = createStyles(colors, cardWidth);
   const isDark = scheme === 'dark';
 
   return (
@@ -53,6 +53,7 @@ BusinessCard.propTypes = {
   distance: PropTypes.string.isRequired,
   image: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
   onPress: PropTypes.func,
+  cardWidth: PropTypes.number,
 };
 
 export default BusinessCard;

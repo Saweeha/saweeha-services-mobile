@@ -364,8 +364,12 @@ const BusinessScreen = () => {
 
   // Handle continue button press
   const handleContinue = () => {
-    // TODO: Navigate to booking/checkout screen
-    console.log('Continue with selected services:', selectedServices);
+    if (selectedServices.length === 0) return;
+    
+    navigation.navigate('BookingDateTime', {
+      selectedServices,
+      business,
+    });
   };
 
   const renderContent = () => {
@@ -517,6 +521,7 @@ const BusinessScreen = () => {
         onPress={handleContinue}
         count={selectedServices.length}
         label="Continue"
+        icon="arrow-forward"
       />
     </SafeAreaView>
   );

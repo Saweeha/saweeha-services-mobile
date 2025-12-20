@@ -6,7 +6,6 @@ import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import { SPACING } from '../../constants/spacing';
-import { SIZES } from '../../constants/sizes';
 
 const { width, height } = Dimensions.get('window');
 const HERO_HEIGHT = width * 0.7;
@@ -20,6 +19,7 @@ const BusinessHero = React.memo(({ images = [] }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
   const [expandedIndex, setExpandedIndex] = useState(0);
+  const [isFavorited, setIsFavorited] = useState(false);
   const autoplayIntervalRef = useRef(null);
   const expandedScrollViewRef = useRef(null);
 
@@ -119,6 +119,28 @@ const BusinessHero = React.memo(({ images = [] }) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
+
+        {/* Favorite Button */}
+        <View style={styles.favoriteButtonContainer}>
+          <TouchableOpacity
+            style={styles.favoriteButton}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            onPress={() => setIsFavorited(!isFavorited)}
+          >
+            <BlurView
+              intensity={80}
+              tint={isDark ? 'dark' : 'light'}
+              style={styles.favoriteButtonBlur}
+            >
+              <Ionicons 
+                name={isFavorited ? "heart" : "heart-outline"} 
+                size={24} 
+                color="#EF4444" 
+              />
+            </BlurView>
+          </TouchableOpacity>
+        </View>
 
         {images.length > 1 && (
           <View style={styles.paginationContainer}>
@@ -267,6 +289,20 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: '40%',
+  },
+  favoriteButtonContainer: {
+    position: 'absolute',
+    top: SPACING.md,
+    right: SPACING.md,
+    zIndex: 10,
+  },
+  favoriteButton: {
+    zIndex: 11,
+  },
+  favoriteButtonBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    padding: SPACING.sm,
   },
   paginationContainer: {
     position: 'absolute',
