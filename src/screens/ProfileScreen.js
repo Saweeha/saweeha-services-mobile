@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert } f
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 import { logout, showAuthModal } from '../store/authSlice';
 import ScreenHeader from '../components/ScreenHeader/ScreenHeader';
 import { SPACING } from '../constants/spacing';
@@ -14,16 +15,36 @@ const ProfileScreen = () => {
   const { scheme, colors, toggleScheme } = useTheme();
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const navigation = useNavigation();
   const isDark = scheme === 'dark';
 
   const handleItemPress = (item) => {
     if (item.type === 'switch') {
       return; // Switch handles its own state
     }
+
+    // Custom onPress handlers (e.g. logout, sign in)
     if (item.onPress) {
       item.onPress();
-    } else {
-      console.log(item.label);
+      return;
+    }
+
+    // Navigation targets based on item id
+    if (item.id === 'edit') {
+      navigation.navigate('EditProfile');
+      return;
+    }
+    if (item.id === 'notifications') {
+      navigation.navigate('Notifications');
+      return;
+    }
+    if (item.id === 'help') {
+      navigation.navigate('HelpSupport');
+      return;
+    }
+    if (item.id === 'about') {
+      navigation.navigate('About');
+      return;
     }
   };
 
@@ -56,22 +77,13 @@ const ProfileScreen = () => {
   const authenticatedMenuItems = [
     { id: 'edit', label: 'Edit Profile', icon: 'create-outline', type: 'action' },
     { id: 'notifications', label: 'Notifications', icon: 'notifications-outline', type: 'action' },
-    { id: 'payment', label: 'Payment Methods', icon: 'card-outline', type: 'action' },
-    { id: 'addresses', label: 'Saved Addresses', icon: 'location-outline', type: 'action' },
   ];
 
   // Menu items that are always visible
   const publicMenuItems = [
     { id: 'help', label: 'Help & Support', icon: 'help-circle-outline', type: 'action' },
     { id: 'about', label: 'About', icon: 'information-circle-outline', type: 'action' },
-    {
-      id: 'dark-mode',
-      label: 'Dark Mode',
-      icon: isDark ? 'moon' : 'moon-outline',
-      type: 'switch',
-      value: isDark,
-      onToggle: toggleScheme,
-    },
+    { id: 'dark-mode', label: 'Dark Mode', icon: isDark ? 'moon' : 'moon-outline', type: 'switch', value: isDark, onToggle: toggleScheme },
   ];
 
   // Build menu items based on auth state

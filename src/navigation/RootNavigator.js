@@ -6,6 +6,10 @@ import TabNavigator from './TabNavigator';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import BusinessScreen from '../screens/BusinessScreen';
 import BookingDateTimeScreen from '../screens/BookingDateTimeScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
+import HelpSupportScreen from '../screens/HelpSupportScreen';
+import AboutScreen from '../screens/AboutScreen';
+import FAQScreen from '../screens/FAQScreen';
 import { getHeaderOptions } from './headerConfig';
 
 const Stack = createNativeStackNavigator();
@@ -23,6 +27,7 @@ const RootNavigator = () => {
           const protectedRoutes = {
             Notifications: true,
             BookingDateTime: true,
+            EditProfile: true,
           };
 
           if (protectedRoutes[screenName] && !isAuthenticated) {
@@ -61,6 +66,34 @@ const RootNavigator = () => {
         component={BookingDateTimeScreen}
         options={{
           title: 'Select Date & Time',
+        }}
+      />
+      <Stack.Screen 
+        name="EditProfile" 
+        component={EditProfileScreen}
+        options={{
+          title: 'Edit Profile',
+        }}
+      />
+      <Stack.Screen 
+        name="HelpSupport" 
+        component={HelpSupportScreen}
+        options={{
+          title: 'Help & Support',
+        }}
+      />
+      <Stack.Screen 
+        name="About" 
+        component={AboutScreen}
+        options={{
+          title: 'About',
+        }}
+      />
+      <Stack.Screen 
+        name="FAQ" 
+        component={FAQScreen}
+        options={{
+          title: 'FAQs',
         }}
       />
     </Stack.Navigator>

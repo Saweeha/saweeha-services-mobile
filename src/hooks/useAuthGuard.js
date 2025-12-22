@@ -6,11 +6,12 @@ import { showAuthModal } from '../store/authSlice';
 // Protected routes configuration
 export const PROTECTED_ROUTES = {
   // Tab routes
-  'Bookings': true,
-  'Favorites': true,
+  Bookings: true,
+  Favorites: true,
   // Stack routes
-  'Notifications': true,
-  'BookingDateTime': true,
+  Notifications: true,
+  BookingDateTime: true,
+  EditProfile: true,
 };
 
 /**
