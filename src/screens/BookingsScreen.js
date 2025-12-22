@@ -10,10 +10,12 @@ import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';
 import { useTheme } from '../hooks/useTheme';
+import { useAuthGuard } from '../hooks/useAuthGuard';
 
 const BookingsScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
+  useAuthGuard('Bookings');
   const [activeTab, setActiveTab] = useState('upcoming');
 
   // Mock data - replace with API calls later

@@ -15,9 +15,11 @@ import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';
 import { useTheme } from '../hooks/useTheme';
 import NotificationItem from '../components/NotificationItem/NotificationItem';
+import { useAuthGuard } from '../hooks/useAuthGuard';
 
 const NotificationsScreen = () => {
   const { colors } = useTheme();
+  useAuthGuard('Notifications');
 
   const [notifications, setNotifications] = useState([
     {

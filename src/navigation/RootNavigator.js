@@ -1,5 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useDispatch, useSelector } from 'react-redux';
+import { showAuthModal } from '../store/authSlice';
 import TabNavigator from './TabNavigator';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import BusinessScreen from '../screens/BusinessScreen';
@@ -9,9 +11,29 @@ import { getHeaderOptions } from './headerConfig';
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
   return (
     <Stack.Navigator
-      screenOptions={({ navigation, route }) => getHeaderOptions(navigation, route)}
+      screenOptions={({ navigation, route }) => {
+        // Intercept navigation to protected routes
+        const originalNavigate = navigation.navigate;
+        navigation.navigate = (screenName, params) => {
+          const protectedRoutes = {
+            Notifications: true,
+            BookingDateTime: true,
+          };
+
+          if (protectedRoutes[screenName] && !isAuthenticated) {
+            dispatch(showAuthModal({ routeName: screenName, type: 'login' }));
+            return;
+          }
+          return originalNavigate(screenName, params);
+        };
+
+        return getHeaderOptions(navigation, route);
+      }}
     >
       <Stack.Screen 
         name="MainTabs" 

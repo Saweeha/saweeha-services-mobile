@@ -4,6 +4,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { store } from './src/store/store';
+import { showAuthModal, setHasShownLaunchModal } from './src/store/authSlice';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -13,18 +16,36 @@ import {
 import RootNavigator from './src/navigation/RootNavigator';
 import { ThemeProvider, useTheme } from './src/hooks/useTheme';
 import { ScrollProvider } from './src/contexts/ScrollContext';
+import LoginModal from './src/components/AuthModal/LoginModal';
+import RegisterModal from './src/components/AuthModal/RegisterModal';
+import ForgotPasswordModal from './src/components/AuthModal/ForgotPasswordModal';
+import OtpModal from './src/components/AuthModal/OtpModal';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 const AppContent = () => {
   const { scheme } = useTheme();
+  const dispatch = useDispatch();
+  const { hasShownLaunchModal } = useSelector((state) => state.auth);
+
+  // Show auth modal on app launch (only once)
+  useEffect(() => {
+    if (!hasShownLaunchModal) {
+      dispatch(showAuthModal({ routeName: null, type: 'login' }));
+      dispatch(setHasShownLaunchModal());
+    }
+  }, [dispatch, hasShownLaunchModal]);
 
   return (
     <>
       <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
         <RootNavigator />
       </NavigationContainer>
+      <LoginModal />
+      <RegisterModal />
+      <ForgotPasswordModal />
+      <OtpModal />
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
     </>
   );
@@ -49,6 +70,7 @@ export default function App() {
   }
 
   return (
+    <Provider store={store}>
     <SafeAreaProvider>
       <ThemeProvider>
         <ScrollProvider>
@@ -56,5 +78,6 @@ export default function App() {
         </ScrollProvider>
       </ThemeProvider>
     </SafeAreaProvider>
+    </Provider>
   );
 }

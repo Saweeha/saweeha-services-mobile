@@ -9,6 +9,7 @@ import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';
 import { useTheme } from '../hooks/useTheme';
+import { useAuthGuard } from '../hooks/useAuthGuard';
 
 const { width } = Dimensions.get('window');
 const CONTAINER_PADDING = SPACING.md;
@@ -18,6 +19,7 @@ const CARD_WIDTH = width - CONTAINER_PADDING * 2;
 const FavoritesScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
+  useAuthGuard('Favorites');
 
   // Mock data - replace with API calls later
   const [favorites] = useState([

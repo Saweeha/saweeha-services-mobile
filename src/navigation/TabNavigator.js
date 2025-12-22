@@ -3,6 +3,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Platform } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { showAuthModal } from '../store/authSlice';
 import { SPACING } from '../constants/spacing';
 import { SIZES } from '../constants/sizes';
 import { useTheme } from '../hooks/useTheme';
@@ -17,6 +19,8 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const { colors, scheme } = useTheme();
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   return (
     <Tab.Navigator
@@ -51,9 +55,39 @@ const TabNavigator = () => {
         tabBarItemStyle: styles.tabBarItem,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Bookings" component={BookingsScreen} />
-      <Tab.Screen name="Favorites" component={FavoritesScreen} />
+      <Tab.Screen 
+        name="Home" 
+        component={HomeScreen}
+        listeners={{
+          tabPress: (e) => {
+            // Allow navigation to Home
+          },
+        }}
+      />
+      <Tab.Screen 
+        name="Bookings" 
+        component={BookingsScreen}
+        listeners={{
+          tabPress: (e) => {
+            if (!isAuthenticated) {
+              e.preventDefault();
+              dispatch(showAuthModal({ routeName: 'Bookings', type: 'login' }));
+            }
+          },
+        }}
+      />
+      <Tab.Screen 
+        name="Favorites" 
+        component={FavoritesScreen}
+        listeners={{
+          tabPress: (e) => {
+            if (!isAuthenticated) {
+              e.preventDefault();
+              dispatch(showAuthModal({ routeName: 'Favorites', type: 'login' }));
+            }
+          },
+        }}
+      />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

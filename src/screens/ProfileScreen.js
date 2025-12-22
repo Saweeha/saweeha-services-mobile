@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, showAuthModal } from '../store/authSlice';
 import ScreenHeader from '../components/ScreenHeader/ScreenHeader';
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
@@ -10,13 +12,9 @@ import { useTheme } from '../hooks/useTheme';
 
 const ProfileScreen = () => {
   const { scheme, colors, toggleScheme } = useTheme();
+  const dispatch = useDispatch();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const isDark = scheme === 'dark';
-
-  // Mock user data - replace with actual user data from store/API
-  const user = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-  };
 
   const handleItemPress = (item) => {
     if (item.type === 'switch') {
@@ -30,15 +28,40 @@ const ProfileScreen = () => {
   };
 
   const handleLogout = () => {
-    // Handle logout logic here
-    console.log('Logout');
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: () => {
+            dispatch(logout());
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
-  const menuItems = [
+  const handleSignIn = () => {
+    dispatch(showAuthModal({ routeName: null, type: 'login' }));
+  };
+
+  // Menu items that require authentication
+  const authenticatedMenuItems = [
     { id: 'edit', label: 'Edit Profile', icon: 'create-outline', type: 'action' },
     { id: 'notifications', label: 'Notifications', icon: 'notifications-outline', type: 'action' },
     { id: 'payment', label: 'Payment Methods', icon: 'card-outline', type: 'action' },
     { id: 'addresses', label: 'Saved Addresses', icon: 'location-outline', type: 'action' },
+  ];
+
+  // Menu items that are always visible
+  const publicMenuItems = [
     { id: 'help', label: 'Help & Support', icon: 'help-circle-outline', type: 'action' },
     { id: 'about', label: 'About', icon: 'information-circle-outline', type: 'action' },
     {
@@ -49,6 +72,13 @@ const ProfileScreen = () => {
       value: isDark,
       onToggle: toggleScheme,
     },
+  ];
+
+  // Build menu items based on auth state
+  const menuItems = isAuthenticated
+    ? [
+        ...authenticatedMenuItems,
+        ...publicMenuItems,
     {
       id: 'logout',
       label: 'Logout',
@@ -57,6 +87,17 @@ const ProfileScreen = () => {
       onPress: handleLogout,
       variant: 'danger',
     },
+      ]
+    : [
+        ...publicMenuItems,
+        {
+          id: 'sign-in',
+          label: 'Sign In',
+          icon: 'log-in-outline',
+          type: 'action',
+          onPress: handleSignIn,
+          variant: 'primary',
+        },
   ];
 
   const renderMenuItem = (item, index) => {
@@ -107,13 +148,26 @@ const ProfileScreen = () => {
           <Ionicons
             name={item.icon}
             size={22}
-            color={item.variant === 'danger' ? colors.error : colors.textSecondary}
+            color={
+              item.variant === 'danger'
+                ? colors.error
+                : item.variant === 'primary'
+                  ? colors.primary
+                  : colors.textSecondary
+            }
             style={styles.menuIcon}
           />
           <Text
             style={[
               styles.menuItemLabel,
-              { color: item.variant === 'danger' ? colors.error : colors.text },
+              {
+                color:
+                  item.variant === 'danger'
+                    ? colors.error
+                    : item.variant === 'primary'
+                      ? colors.primary
+                      : colors.text,
+              },
             ]}
           >
             {item.label}
@@ -143,10 +197,21 @@ const ProfileScreen = () => {
           <View style={[styles.avatar, { backgroundColor: colors.primaryLight }]}>
             <Ionicons name="person" size={32} color={colors.primary} />
           </View>
+          {isAuthenticated && user ? (
+            <>
           <Text style={[styles.userName, { color: colors.text }]}>{user.name}</Text>
           <Text style={[styles.userEmail, { color: colors.textSecondary }]}>
             {user.email}
           </Text>
+            </>
+          ) : (
+            <>
+              <Text style={[styles.userName, { color: colors.text }]}>Guest</Text>
+              <Text style={[styles.userEmail, { color: colors.textSecondary }]}>
+                Sign in to access your profile
+              </Text>
+            </>
+          )}
         </View>
 
         {/* Menu Items */}

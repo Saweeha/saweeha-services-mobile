@@ -16,11 +16,13 @@ import BookingConfirmationModal from '../components/BookingConfirmationModal/Boo
 import { SPACING } from '../constants/spacing';
 import { SIZES } from '../constants/sizes';
 import { useTheme } from '../hooks/useTheme';
+import { useAuthGuard } from '../hooks/useAuthGuard';
 
 const BookingDateTimeScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { colors } = useTheme();
+  useAuthGuard('BookingDateTime');
   const { selectedServices, business } = route.params || {};
 
   const [selectedDate, setSelectedDate] = useState(null);

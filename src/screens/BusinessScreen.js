@@ -366,6 +366,7 @@ const BusinessScreen = () => {
   const handleContinue = () => {
     if (selectedServices.length === 0) return;
     
+    // Check auth before navigating - handled by RootNavigator listener
     navigation.navigate('BookingDateTime', {
       selectedServices,
       business,
