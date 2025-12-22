@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
-import { hideAuthModal, showAuthModal, openOtpModal } from '../../store/authSlice';
+import { hideAuthModal, showAuthModal, openOtpModal, login } from '../../store/authSlice';
 import { useTheme } from '../../hooks/useTheme';
 import styles from './AuthModal.styles';
 import AuthTextInput from '../AuthTextInput/AuthTextInput';
@@ -102,6 +102,14 @@ const RegisterModal = () => {
     // In a real app, call API to register and then send OTP
     dispatch(openOtpModal({ context: 'register', email }));
     dispatch(hideAuthModal());
+  };
+
+  const handleSocialRegister = () => {
+    // Social auth bypasses form validation
+    // In a real app, this would trigger Google/Facebook auth flow
+    // For social auth, we log the user in directly (no OTP needed since provider handles verification)
+    dispatch(login());
+    handleClose();
   };
 
   const switchToLogin = () => {
@@ -222,8 +230,8 @@ const RegisterModal = () => {
 
               <SocialAuthButtons
                 variant="register"
-                onGooglePress={handleRegister}
-                onFacebookPress={handleRegister}
+                onGooglePress={handleSocialRegister}
+                onFacebookPress={handleSocialRegister}
               />
 
               <TouchableOpacity style={styles.closeTextButton} onPress={handleClose}>

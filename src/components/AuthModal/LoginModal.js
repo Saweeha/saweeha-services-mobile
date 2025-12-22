@@ -69,6 +69,13 @@ const LoginModal = () => {
     handleClose();
   };
 
+  const handleSocialLogin = () => {
+    // Social auth bypasses form validation
+    // In a real app, this would trigger Google/Facebook auth flow
+    dispatch(login());
+    handleClose();
+  };
+
   const switchToRegister = () => {
     setErrors({});
     setTouched({});
@@ -168,8 +175,8 @@ const LoginModal = () => {
 
               <SocialAuthButtons
                 variant="login"
-                onGooglePress={handleLogin}
-                onFacebookPress={handleLogin}
+                onGooglePress={handleSocialLogin}
+                onFacebookPress={handleSocialLogin}
               />
 
               <TouchableOpacity style={styles.closeTextButton} onPress={handleClose}>
