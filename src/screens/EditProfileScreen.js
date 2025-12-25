@@ -7,7 +7,7 @@ import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { useTheme } from '../hooks/useTheme';
 import { useAuthGuard } from '../hooks/useAuthGuard';
-import AuthTextInput from '../components/AuthTextInput/AuthTextInput';
+import AuthTextInput from '../components/auth/AuthTextInput/AuthTextInput';
 import { SIZES } from '../constants/sizes';
 
 const EditProfileScreen = () => {

@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { logout, showAuthModal } from '../store/authSlice';
-import ScreenHeader from '../components/ScreenHeader/ScreenHeader';
+import ScreenHeader from '../components/layout/ScreenHeader/ScreenHeader';
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';

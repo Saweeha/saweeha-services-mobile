@@ -16,10 +16,10 @@ import {
 import RootNavigator from './src/navigation/RootNavigator';
 import { ThemeProvider, useTheme } from './src/hooks/useTheme';
 import { ScrollProvider } from './src/contexts/ScrollContext';
-import LoginModal from './src/components/AuthModal/LoginModal';
-import RegisterModal from './src/components/AuthModal/RegisterModal';
-import ForgotPasswordModal from './src/components/AuthModal/ForgotPasswordModal';
-import OtpModal from './src/components/AuthModal/OtpModal';
+import LoginModal from './src/components/modals/AuthModal/LoginModal';
+import RegisterModal from './src/components/modals/AuthModal/RegisterModal';
+import ForgotPasswordModal from './src/components/modals/AuthModal/ForgotPasswordModal';
+import OtpModal from './src/components/modals/AuthModal/OtpModal';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();

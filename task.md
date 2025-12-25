@@ -1,106 +1,99 @@
-# Refactor Animated Header System (Navigation-Owned Only)
+# 🧹 UI Structure Refactor Task
 
-## Hard Constraint
-- AnimatedHeader MUST exist only inside navigation
-- No screen may import, render, or configure headers
-- No `navigation.setOptions` from screens
-- Screens remain completely unaware of header behavior
+## Objective
 
----
+Refactor the existing `components` and `screens` directories by introducing **clear, intention-based subfolders** while keeping:
+- The same top-level structure
+- No mixing of screens and components
+- No behavior or logic changes
+- No feature-based colocation
 
-## Goal
-Refactor the animated header system to:
-- Keep header logic fully inside navigation
-- Preserve zero-configuration screens
-- Remove route-name–keyed scroll state
-- Avoid storing Animated.Values directly in Context
-- Make the system lifecycle-safe and instance-safe
+The goal is to improve discoverability, mental mapping, and scalability.
 
 ---
 
-## Core Design Change
-
-### Replace route-name–based scroll registry
-❌ `scrollMap[route.name]`
-
-### With navigation-key–scoped channels
-✅ Use `route.key` or focus-aware registration
-✅ One active scroll channel per focused screen
-
----
-
-## Step 1: Refactor ScrollContext → ScrollChannelContext
-
-ScrollContext should:
-- Track ONLY the currently focused scroll channel
-- Expose:
-  - `setActiveScrollChannel(channel)`
-  - `clearActiveScrollChannel()`
-  - `activeScrollChannel`
-
-A scroll channel contains:
-- `scrollY` (Animated.Value or SharedValue)
-- `isCollapsed` (derived boolean or derived value)
+## Constraints (Important)
 
 DO NOT:
-- Store multiple screens
-- Store maps keyed by route names
+- Move screens into components or vice versa
+- Change component logic or props
+- Rename exported components
+- Change runtime behavior
+- Introduce new architectural patterns
+
+ONLY:
+- Create subfolders
+- Move files
+- Update imports accordingly
 
 ---
 
-## Step 2: AutoScrollView Responsibilities
+## 1️⃣ Components Refactor
 
-AutoScrollView should:
-- Create its own scrollY animated value
-- Detect focus using `useFocusEffect`
-- Register itself as the active scroll channel ON FOCUS
-- Unregister ON BLUR / UNMOUNT
+### Current Problem
+`src/components` is flat and mixes:
+- UI primitives
+- Layout components
+- Domain-specific cards
+- Modals
+- Infrastructure helpers
 
-It must NOT:
-- Know anything about headers
-- Reference navigation options
-- Reference route names
-
----
-
-## Step 3: AnimatedHeader Responsibilities
-
-AnimatedHeader should:
-- Read ONLY the active scroll channel from context
-- Gracefully handle `null` (no scroll)
-- Animate based on the active channel only
-- Use explicit scroll thresholds, not opacity inversion
-
-Floating back button logic:
-- Driven by `isCollapsed`
-- Not inverse opacity math
+### Solution
+Organize components by **responsibility**, not feature.
 
 ---
 
-## Step 4: RootNavigator Responsibilities
+### ✅ Target Structure
 
-RootNavigator should:
-- Decide which routes use AnimatedHeader
-- Render AnimatedHeader ONLY in `header`
-- Never manage scroll state
-- Never reference scroll values directly
-
----
-
-## Step 5: Lifecycle Safety
-
-Ensure:
-- Only ONE scroll channel is active at a time
-- Channel is cleared when screen loses focus
-- Header animations reset cleanly on navigation transitions
-
----
-
-## Expected Outcome
-
-- Header logic remains fully inside navigation
-- Screens stay 100% clean
-- No route-name coupling
-- No global animated value registry
-- Safe with nested navigators and repeated screens
-- Predictable, debuggable behavior
+```txt
+src/components/
+├── ui/
+│   ├── Card/
+│   ├── SearchBar/
+│   ├── ContinueButton/
+│   ├── FloatingContinueButton/
+│   └── CustomTabs/
+│
+├── layout/
+│   ├── ScreenHeader/
+│   ├── CustomHeader/
+│   ├── HomeHeader/
+│   ├── SectionHeader/
+│   └── BackButton/
+│
+├── list/
+│   ├── AutoFlatList/
+│   ├── AutoScrollView/
+│   ├── BookingListItem/
+│   ├── ServiceListItem/
+│   ├── NotificationItem/
+│   ├── ReviewListItem/
+│   └── TeamListItem/
+│
+├── cards/
+│   ├── BookingCard/
+│   ├── BusinessCard/
+│   ├── CategoryCard/
+│   ├── InfoCard/
+│   ├── ServiceCard/
+│   └── TeamMemberCard/
+│
+├── modals/
+│   ├── AuthModal/
+│   ├── BookingConfirmationModal/
+│   └── ProfessionalSelectionModal/
+│
+├── auth/
+│   ├── AuthTextInput/
+│   └── SocialAuthButtons/
+│
+├── booking/
+│   ├── DatePicker/
+│   └── TimeSlotPicker/
+│
+├── business/
+│   ├── BusinessHero/
+│   └── BusinessInfo/
+│
+└── media/
+    └── PromotionSwiper/

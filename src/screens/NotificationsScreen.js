@@ -14,7 +14,7 @@ import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';
 import { useTheme } from '../hooks/useTheme';
-import NotificationItem from '../components/NotificationItem/NotificationItem';
+import NotificationItem from '../components/list/NotificationItem/NotificationItem';
 import { useAuthGuard } from '../hooks/useAuthGuard';
 
 const NotificationsScreen = () => {

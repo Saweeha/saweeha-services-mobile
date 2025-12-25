@@ -5,12 +5,12 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
 
 // Components
-import AutoScrollView from '../components/AutoScrollView/AutoScrollView';
-import DatePicker from '../components/DatePicker/DatePicker';
-import TimeSlotPicker from '../components/TimeSlotPicker/TimeSlotPicker';
-import ContinueButton from '../components/ContinueButton/ContinueButton';
-import FloatingContinueButton from '../components/FloatingContinueButton/FloatingContinueButton';
-import BookingConfirmationModal from '../components/BookingConfirmationModal/BookingConfirmationModal';
+import AutoScrollView from '../components/list/AutoScrollView/AutoScrollView';
+import DatePicker from '../components/booking/DatePicker/DatePicker';
+import TimeSlotPicker from '../components/booking/TimeSlotPicker/TimeSlotPicker';
+import ContinueButton from '../components/ui/ContinueButton/ContinueButton';
+import FloatingContinueButton from '../components/ui/FloatingContinueButton/FloatingContinueButton';
+import BookingConfirmationModal from '../components/modals/BookingConfirmationModal/BookingConfirmationModal';
 
 // Constants & Hooks
 import { SPACING } from '../constants/spacing';

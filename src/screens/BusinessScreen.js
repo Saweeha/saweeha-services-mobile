@@ -4,20 +4,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
 // Components
-import CustomTabs from '../components/CustomTabs/CustomTabs';
-import AutoScrollView from '../components/AutoScrollView/AutoScrollView';
+import CustomTabs from '../components/ui/CustomTabs/CustomTabs';
+import AutoScrollView from '../components/list/AutoScrollView/AutoScrollView';
 
 // New Components
-import BusinessHero from '../components/BusinessHero/BusinessHero';
-import BusinessInfo from '../components/BusinessInfo/BusinessInfo';
-import ServiceListItem from '../components/ServiceListItem/ServiceListItem';
-import TeamMemberCard from '../components/TeamMemberCard/TeamMemberCard';
-import ReviewListItem from '../components/ReviewListItem/ReviewListItem';
-import InfoCard from '../components/InfoCard/InfoCard';
-import ServiceCategoryFilter from '../components/ServiceCategoryFilter/ServiceCategoryFilter';
-import ProfessionalSelectionModal from '../components/ProfessionalSelectionModal/ProfessionalSelectionModal';
-import ContinueButton from '../components/ContinueButton/ContinueButton';
-import FloatingContinueButton from '../components/FloatingContinueButton/FloatingContinueButton';
+import BusinessHero from '../components/business/BusinessHero/BusinessHero';
+import BusinessInfo from '../components/business/BusinessInfo/BusinessInfo';
+import ServiceListItem from '../components/list/ServiceListItem/ServiceListItem';
+import TeamMemberCard from '../components/cards/TeamMemberCard/TeamMemberCard';
+import ReviewListItem from '../components/list/ReviewListItem/ReviewListItem';
+import InfoCard from '../components/cards/InfoCard/InfoCard';
+import ServiceCategoryFilter from '../components/ui/ServiceCategoryFilter/ServiceCategoryFilter';
+import ProfessionalSelectionModal from '../components/modals/ProfessionalSelectionModal/ProfessionalSelectionModal';
+import ContinueButton from '../components/ui/ContinueButton/ContinueButton';
+import FloatingContinueButton from '../components/ui/FloatingContinueButton/FloatingContinueButton';
 
 // Constants & Hooks
 import { SPACING } from '../constants/spacing';

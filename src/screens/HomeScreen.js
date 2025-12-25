@@ -4,10 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
 // Components
-import PromotionSwiper from '../components/PromotionSwiper/PromotionSwiper';
-import CategoryCard from '../components/CategoryCard/CategoryCard';
-import BusinessCard from '../components/BusinessCard/BusinessCard';
-import HomeHeader from '../components/HomeHeader/HomeHeader';
+import PromotionSwiper from '../components/media/PromotionSwiper/PromotionSwiper';
+import CategoryCard from '../components/cards/CategoryCard/CategoryCard';
+import BusinessCard from '../components/cards/BusinessCard/BusinessCard';
+import HomeHeader from '../components/layout/HomeHeader/HomeHeader';
 
 // Constants
 import { SPACING } from '../constants/spacing';

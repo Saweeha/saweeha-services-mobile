@@ -1,6 +1,6 @@
 import React from 'react';
-import CustomHeader from '../components/CustomHeader/CustomHeader';
-import AnimatedHeader from '../components/AnimatedHeader/AnimatedHeader';
+import CustomHeader from '../components/layout/CustomHeader/CustomHeader';
+import AnimatedHeader from '../components/layout/AnimatedHeader/AnimatedHeader';
 
 /**
  * List of screen names that should use animated headers
