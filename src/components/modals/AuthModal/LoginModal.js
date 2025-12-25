@@ -2,18 +2,19 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
-import { hideAuthModal, login, showAuthModal, openForgotPasswordModal } from '../../../store/authSlice';
+import { hideAuthModal, loginUser, showAuthModal, openForgotPasswordModal } from '../../../store/authSlice';
 import { useTheme } from '../../../hooks/useTheme';
 import styles from './AuthModal.styles';
 import AuthTextInput from '../../auth/AuthTextInput/AuthTextInput';
 import SocialAuthButtons from '../../auth/SocialAuthButtons/SocialAuthButtons';
 import { validateLoginForm, validateEmail } from '../../../utils/validators';
 import { Ionicons } from '@expo/vector-icons';
+import { ActivityIndicator } from 'react-native';
 
 const LoginModal = () => {
   const dispatch = useDispatch();
   const { colors } = useTheme();
-  const { showAuthModal: visible, authModalType } = useSelector((state) => state.auth);
+  const { showAuthModal: visible, authModalType, loading, error } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -65,15 +66,16 @@ const LoginModal = () => {
 
     // Clear errors and proceed with login
     setErrors({});
-    dispatch(login());
-    handleClose();
+    dispatch(loginUser({ email, password }));
+    // handleClose(); // Let the thunk success handler close the modal
   };
 
   const handleSocialLogin = () => {
     // Social auth bypasses form validation
     // In a real app, this would trigger Google/Facebook auth flow
-    dispatch(login());
-    handleClose();
+    // dispatch(login());
+    alert('Social login not implemented yet');
+    // handleClose();
   };
 
   const switchToRegister = () => {
@@ -125,6 +127,12 @@ const LoginModal = () => {
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
+              {error && (
+                <Text style={{ color: colors.error, marginBottom: 10, textAlign: 'center' }}>
+                  {error}
+                </Text>
+              )}
+
               <AuthTextInput
                 label="Email"
                 icon="mail-outline"

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
-import { logout, showAuthModal } from '../store/authSlice';
+import { logoutUser, showAuthModal } from '../store/authSlice';
 import ScreenHeader from '../components/layout/ScreenHeader/ScreenHeader';
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
@@ -14,9 +14,11 @@ import { useTheme } from '../hooks/useTheme';
 const ProfileScreen = () => {
   const { scheme, colors, toggleScheme } = useTheme();
   const dispatch = useDispatch();
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { isAuthenticated, user, loading } = useSelector((state) => state.auth);
   const navigation = useNavigation();
   const isDark = scheme === 'dark';
+
+  console.log('ProfileScreen Rendering - Auth State:', { isAuthenticated, hasUser: !!user, loading });
 
   const handleItemPress = (item) => {
     if (item.type === 'switch') {
@@ -61,7 +63,7 @@ const ProfileScreen = () => {
           text: 'Logout',
           style: 'destructive',
           onPress: () => {
-            dispatch(logout());
+            dispatch(logoutUser());
           },
         },
       ],
@@ -89,28 +91,28 @@ const ProfileScreen = () => {
   // Build menu items based on auth state
   const menuItems = isAuthenticated
     ? [
-        ...authenticatedMenuItems,
-        ...publicMenuItems,
-    {
-      id: 'logout',
-      label: 'Logout',
-      icon: 'log-out-outline',
-      type: 'action',
-      onPress: handleLogout,
-      variant: 'danger',
-    },
-      ]
+      ...authenticatedMenuItems,
+      ...publicMenuItems,
+      {
+        id: 'logout',
+        label: 'Logout',
+        icon: 'log-out-outline',
+        type: 'action',
+        onPress: handleLogout,
+        variant: 'danger',
+      },
+    ]
     : [
-        ...publicMenuItems,
-        {
-          id: 'sign-in',
-          label: 'Sign In',
-          icon: 'log-in-outline',
-          type: 'action',
-          onPress: handleSignIn,
-          variant: 'primary',
-        },
-  ];
+      ...publicMenuItems,
+      {
+        id: 'sign-in',
+        label: 'Sign In',
+        icon: 'log-in-outline',
+        type: 'action',
+        onPress: handleSignIn,
+        variant: 'primary',
+      },
+    ];
 
   const renderMenuItem = (item, index) => {
     const isLast = index === menuItems.length - 1;
@@ -211,10 +213,10 @@ const ProfileScreen = () => {
           </View>
           {isAuthenticated && user ? (
             <>
-          <Text style={[styles.userName, { color: colors.text }]}>{user.name}</Text>
-          <Text style={[styles.userEmail, { color: colors.textSecondary }]}>
-            {user.email}
-          </Text>
+              <Text style={[styles.userName, { color: colors.text }]}>{user.name}</Text>
+              <Text style={[styles.userEmail, { color: colors.textSecondary }]}>
+                {user.email}
+              </Text>
             </>
           ) : (
             <>

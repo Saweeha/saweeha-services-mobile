@@ -1,50 +1,120 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import * as ImagePicker from 'expo-image-picker';
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { useTheme } from '../hooks/useTheme';
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import AuthTextInput from '../components/auth/AuthTextInput/AuthTextInput';
 import { SIZES } from '../constants/sizes';
+import { updateUserProfile, clearError } from '../store/authSlice';
 
-const EditProfileScreen = () => {
+const EditProfileScreen = ({ navigation }) => {
   const { colors } = useTheme();
+  const dispatch = useDispatch();
   useAuthGuard('EditProfile');
 
-  const { user } = useSelector((state) => state.auth);
+  const { user, loading, error } = useSelector((state) => state.auth);
 
   const [name, setName] = useState(user?.name ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [phone, setPhone] = useState(user?.phone ?? '');
-  const [avatarUri, setAvatarUri] = useState(user?.avatarUrl ?? null);
-  const [dateOfBirth, setDateOfBirth] = useState(user?.dateOfBirth ?? '');
+  const [avatarUri, setAvatarUri] = useState(user?.profile_picture_url ?? null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [dateOfBirth, setDateOfBirth] = useState(user?.date_of_birth ?? '');
   const [gender, setGender] = useState(user?.gender ?? '');
 
-  const handleSave = useCallback(() => {
-    // TODO: Connect to API / store update
-    Alert.alert('Profile updated', 'Your profile details have been saved.');
-  }, []);
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Error', error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
+
+  // Synchronize local state with user object when it changes (e.g. after checkAuthStatus)
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+      setPhone(user.phone || '');
+      setAvatarUri(user.profile_picture_url || null);
+      setDateOfBirth(user.date_of_birth || '');
+      setGender(user.gender || '');
+    }
+  }, [user]);
+
+  const handlePickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'We need camera roll permissions to change your profile picture.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0]);
+      setAvatarUri(result.assets[0].uri);
+    }
+  };
+
+  const handleSave = useCallback(async () => {
+    if (!name.trim()) {
+      Alert.alert('Missing Info', 'Please enter your name.');
+      return;
+    }
+
+    const userData = {
+      name,
+      email,
+      phone,
+      date_of_birth: dateOfBirth,
+      gender,
+    };
+
+    if (selectedImage) {
+      userData.image = {
+        uri: selectedImage.uri,
+        fileName: selectedImage.fileName || 'profile.jpg',
+        mimeType: selectedImage.mimeType || 'image/jpeg',
+      };
+    }
+
+    try {
+      const resultAction = await dispatch(updateUserProfile({ id: user.id, userData }));
+      if (updateUserProfile.fulfilled.match(resultAction)) {
+        Alert.alert('Profile updated', 'Your profile details have been saved.');
+        navigation.goBack();
+      }
+    } catch (err) {
+      console.error('Update failed:', err);
+    }
+  }, [name, email, phone, dateOfBirth, gender, selectedImage, user?.id, dispatch, navigation]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['bottom']}>
       <View style={styles.avatarSection}>
-        <View style={[styles.avatar, { backgroundColor: colors.primaryLight }]}>
+        <View style={[styles.avatar, { backgroundColor: colors.overlay, overflow: 'hidden' }]}>
           {avatarUri ? (
-            // eslint-disable-next-line react-native/no-inline-styles
-            <View style={{ flex: 1 }} />
+            <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
           ) : (
-            <Ionicons name="person" size={32} color={colors.primary} />
+            <Ionicons name="person" size={48} color={colors.textSecondary} />
           )}
         </View>
         <TouchableOpacity
           style={[styles.changePhotoButton, { borderColor: colors.primary }]}
           activeOpacity={0.8}
-          onPress={() => {
-            // TODO: Integrate image picker
-          }}
+          onPress={handlePickImage}
+          disabled={loading}
         >
           <Text style={[styles.changePhotoText, { color: colors.primary }]}>
             Change photo
@@ -60,6 +130,7 @@ const EditProfileScreen = () => {
           placeholder="Enter your full name"
           icon="person-outline"
           autoCapitalize="words"
+          editable={!loading}
         />
 
         <Text style={[styles.label, { color: colors.textSecondary }]}>Email</Text>
@@ -70,6 +141,7 @@ const EditProfileScreen = () => {
           keyboardType="email-address"
           autoCapitalize="none"
           icon="mail-outline"
+          editable={!loading}
         />
 
         <Text style={[styles.label, { color: colors.textSecondary }]}>Phone number</Text>
@@ -79,6 +151,7 @@ const EditProfileScreen = () => {
           placeholder="Enter your phone number"
           keyboardType="phone-pad"
           icon="call-outline"
+          editable={!loading}
         />
 
         <Text style={[styles.label, { color: colors.textSecondary }]}>Date of birth</Text>
@@ -93,7 +166,13 @@ const EditProfileScreen = () => {
           activeOpacity={0.8}
           onPress={() => {
             // TODO: Hook to date picker modal
+            // For now just manually setting for demo or use a prompt
+            Alert.alert('Date of Birth', 'Date picker will be integrated here.', [
+              { text: 'Set Tomorrow', onPress: () => setDateOfBirth('2024-01-01') },
+              { text: 'Cancel', style: 'cancel' }
+            ]);
           }}
+          disabled={loading}
         >
           <View style={styles.inlineLeft}>
             <Ionicons
@@ -128,6 +207,7 @@ const EditProfileScreen = () => {
                 ]}
                 activeOpacity={0.8}
                 onPress={() => setGender(value)}
+                disabled={loading}
               >
                 <Text
                   style={[
@@ -143,11 +223,20 @@ const EditProfileScreen = () => {
         </View>
 
         <TouchableOpacity
-          style={[styles.saveButton, { backgroundColor: colors.primary }]}
+          style={[
+            styles.saveButton,
+            { backgroundColor: colors.primary },
+            loading && { opacity: 0.7 }
+          ]}
           activeOpacity={0.85}
           onPress={handleSave}
+          disabled={loading}
         >
-          <Text style={[styles.saveButtonText, { color: colors.textWhite }]}>Save changes</Text>
+          {loading ? (
+            <ActivityIndicator color={colors.textWhite} />
+          ) : (
+            <Text style={[styles.saveButtonText, { color: colors.textWhite }]}>Save changes</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -171,6 +260,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.sm,
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
   },
   changePhotoButton: {
     paddingHorizontal: SPACING.md,

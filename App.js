@@ -6,7 +6,7 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { store } from './src/store/store';
-import { showAuthModal, setHasShownLaunchModal } from './src/store/authSlice';
+import { showAuthModal, setHasShownLaunchModal, checkAuthStatus } from './src/store/authSlice';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -27,13 +27,32 @@ SplashScreen.preventAutoHideAsync();
 const AppContent = () => {
   const { scheme } = useTheme();
   const dispatch = useDispatch();
-  const { hasShownLaunchModal } = useSelector((state) => state.auth);
+  const { hasShownLaunchModal, isAuthenticated, user, loading } = useSelector((state) => state.auth);
 
-  // Show auth modal on app launch (only once)
+  console.log('App Rendering - Auth State:', { isAuthenticated, hasUser: !!user, loading, hasShownLaunchModal });
+
+  // Check auth status on app launch
+  useEffect(() => {
+    console.log('App Mounting - calling checkAuthStatus');
+    dispatch(checkAuthStatus());
+  }, [dispatch]);
+
+  // Show auth modal on app launch if not authenticated (only once)
   useEffect(() => {
     if (!hasShownLaunchModal) {
-      dispatch(showAuthModal({ routeName: null, type: 'login' }));
-      dispatch(setHasShownLaunchModal());
+      // We check if isAuthenticated is false, but we should also wait for loading
+      // However, the current slice logic sets isAuthenticated to false by default.
+      // To avoid flashing the modal if the user IS logged in, we can wait a bit or
+      // check if we have a token first.
+      const timer = setTimeout(async () => {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+          dispatch(showAuthModal({ routeName: null, type: 'login' }));
+        }
+        dispatch(setHasShownLaunchModal());
+      }, 500); // Small delay to allow checkAuthStatus to potentially finish or at least check AsyncStorage
+
+      return () => clearTimeout(timer);
     }
   }, [dispatch, hasShownLaunchModal]);
 
@@ -71,13 +90,13 @@ export default function App() {
 
   return (
     <Provider store={store}>
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <ScrollProvider>
-          <AppContent />
-        </ScrollProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <ScrollProvider>
+            <AppContent />
+          </ScrollProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
     </Provider>
   );
 }

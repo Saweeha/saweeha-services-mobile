@@ -4,18 +4,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  openOtpModal,
+  forgotPassword,
   closeForgotPasswordModal,
   showAuthModal,
 } from '../../../store/authSlice';
 import { useTheme } from '../../../hooks/useTheme';
 import styles from './AuthModal.styles';
 import AuthTextInput from '../../auth/AuthTextInput/AuthTextInput';
+import { ActivityIndicator } from 'react-native';
 
 const ForgotPasswordModal = () => {
   const dispatch = useDispatch();
   const { colors } = useTheme();
-  const { showForgotPasswordModal, otpEmail } = useSelector((state) => state.auth);
+  const { showForgotPasswordModal, otpEmail, loading, error } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState('');
 
@@ -32,9 +33,9 @@ const ForgotPasswordModal = () => {
 
   const handleSubmit = () => {
     if (!email) return;
-    // In a real app, call API to send OTP here
-    dispatch(openOtpModal({ context: 'reset', email }));
-    dispatch(closeForgotPasswordModal());
+    // Call the API to send the password reset code
+    dispatch(forgotPassword(email));
+    // The authSlice will open OTP modal on success
   };
 
   const handleBackToLogin = () => {
@@ -59,7 +60,7 @@ const ForgotPasswordModal = () => {
             <View style={styles.header}>
               <Text style={[styles.title, { color: colors.text }]}>Reset Password</Text>
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                Enter your email and we&apos;ll send you a 4-digit code to reset your password.
+                Enter your email and we&apos;ll send you a 6-digit code to reset your password.
               </Text>
               <TouchableOpacity
                 style={styles.closeButton}
@@ -75,6 +76,12 @@ const ForgotPasswordModal = () => {
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
+              {error && (
+                <Text style={{ color: colors.error, marginBottom: 10, textAlign: 'center' }}>
+                  {error}
+                </Text>
+              )}
+
               <AuthTextInput
                 label="Email"
                 icon="mail-outline"
@@ -91,15 +98,19 @@ const ForgotPasswordModal = () => {
                   styles.submitButton,
                   {
                     backgroundColor: colors.primary,
-                    opacity: email ? 1 : 0.6,
+                    opacity: email && !loading ? 1 : 0.6,
                   },
                 ]}
                 onPress={handleSubmit}
-                disabled={!email}
+                disabled={!email || loading}
               >
-                <Text style={[styles.submitButtonText, { color: colors.textWhite }]}>
-                  Send Code
-                </Text>
+                {loading ? (
+                  <ActivityIndicator color={colors.textWhite} />
+                ) : (
+                  <Text style={[styles.submitButtonText, { color: colors.textWhite }]}>
+                    Send Code
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.closeTextButton} onPress={handleBackToLogin}>
