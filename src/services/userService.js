@@ -9,10 +9,8 @@ export const userService = {
             Object.keys(userData).forEach((key) => {
                 if (key === 'image') {
                     const image = userData[key];
-                    const uri = Platform.OS === 'ios' ? image.uri.replace('file://', '') : image.uri;
-
                     formData.append('image', {
-                        uri: uri,
+                        uri: image.uri,
                         name: image.fileName || `profile_${id}.jpg`,
                         type: image.mimeType || 'image/jpeg',
                     });
@@ -21,12 +19,7 @@ export const userService = {
                 }
             });
 
-            return apiClient.put(`/users/${id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                transformRequest: (data) => data,
-            });
+            return apiClient.put(`/users/${id}`, formData);
         }
 
         return apiClient.put(`/users/${id}`, userData);

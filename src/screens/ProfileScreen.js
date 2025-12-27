@@ -11,6 +11,8 @@ import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';
 import { useTheme } from '../hooks/useTheme';
 
+import ProgressiveImage from '../components/ui/ProgressiveImage/ProgressiveImage';
+
 const ProfileScreen = () => {
   const { scheme, colors, toggleScheme } = useTheme();
   const dispatch = useDispatch();
@@ -208,9 +210,19 @@ const ProfileScreen = () => {
       >
         {/* Profile Section */}
         <View style={styles.profileSection}>
-          <View style={[styles.avatar, { backgroundColor: colors.primaryLight }]}>
-            <Ionicons name="person" size={32} color={colors.primary} />
+          <View style={[styles.avatar, { backgroundColor: colors.primaryLight, overflow: 'hidden' }]}>
+            {isAuthenticated && user?.profile_picture_url ? (
+              <ProgressiveImage
+                source={{ uri: user.profile_picture_url }}
+                thumbnailSource={user.profile_picture_thumbnail_url ? { uri: user.profile_picture_thumbnail_url } : null}
+                style={styles.avatarImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <Ionicons name="person" size={32} color={colors.primary} />
+            )}
           </View>
+
           {isAuthenticated && user ? (
             <>
               <Text style={[styles.userName, { color: colors.text }]}>{user.name}</Text>
@@ -260,6 +272,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.md,
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
   },
   userName: {
     fontSize: TYPOGRAPHY.fontSize.xl,

@@ -12,6 +12,9 @@ import AuthTextInput from '../components/auth/AuthTextInput/AuthTextInput';
 import { SIZES } from '../constants/sizes';
 import { updateUserProfile, clearError } from '../store/authSlice';
 
+import { formatDate } from '../utils/date';
+import ProgressiveImage from '../components/ui/ProgressiveImage/ProgressiveImage';
+
 const EditProfileScreen = ({ navigation }) => {
   const { colors } = useTheme();
   const dispatch = useDispatch();
@@ -24,7 +27,7 @@ const EditProfileScreen = ({ navigation }) => {
   const [phone, setPhone] = useState(user?.phone ?? '');
   const [avatarUri, setAvatarUri] = useState(user?.profile_picture_url ?? null);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [dateOfBirth, setDateOfBirth] = useState(user?.date_of_birth ?? '');
+  const [dateOfBirth, setDateOfBirth] = useState(user?.date_of_birth ? formatDate(user.date_of_birth) : '');
   const [gender, setGender] = useState(user?.gender ?? '');
 
   useEffect(() => {
@@ -41,7 +44,7 @@ const EditProfileScreen = ({ navigation }) => {
       setEmail(user.email || '');
       setPhone(user.phone || '');
       setAvatarUri(user.profile_picture_url || null);
-      setDateOfBirth(user.date_of_birth || '');
+      setDateOfBirth(user.date_of_birth ? formatDate(user.date_of_birth) : '');
       setGender(user.gender || '');
     }
   }, [user]);
@@ -105,11 +108,17 @@ const EditProfileScreen = ({ navigation }) => {
       <View style={styles.avatarSection}>
         <View style={[styles.avatar, { backgroundColor: colors.overlay, overflow: 'hidden' }]}>
           {avatarUri ? (
-            <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
+            <ProgressiveImage
+              source={{ uri: avatarUri }}
+              thumbnailSource={(!selectedImage && user?.profile_picture_thumbnail_url) ? { uri: user.profile_picture_thumbnail_url } : null}
+              style={styles.avatarImage}
+              resizeMode="cover"
+            />
           ) : (
             <Ionicons name="person" size={48} color={colors.textSecondary} />
           )}
         </View>
+
         <TouchableOpacity
           style={[styles.changePhotoButton, { borderColor: colors.primary }]}
           activeOpacity={0.8}
