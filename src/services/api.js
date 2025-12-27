@@ -164,4 +164,10 @@ export const userService = {
   },
 };
 
+export const businessService = {
+  getAllBusinesses: async () => {
+    return api.get('/business/all');
+  },
+};
+
 export default api;

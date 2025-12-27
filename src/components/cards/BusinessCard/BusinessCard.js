@@ -28,7 +28,7 @@ const BusinessCard = React.memo(({ name, category, rating, distance, image, onPr
         style={styles.ratingContainer}
       >
         <Ionicons name="star" size={14} color={colors.warning} />
-        <Text style={styles.rating}>{rating}</Text>
+        <Text style={styles.rating}>{rating || "Not Rated"}</Text>
       </BlurView>
       <View style={styles.content}>
         <Text style={styles.name} numberOfLines={1}>

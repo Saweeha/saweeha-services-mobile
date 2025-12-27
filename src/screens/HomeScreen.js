@@ -8,6 +8,7 @@ import PromotionSwiper from '../components/media/PromotionSwiper/PromotionSwiper
 import CategoryCard from '../components/cards/CategoryCard/CategoryCard';
 import BusinessCard from '../components/cards/BusinessCard/BusinessCard';
 import HomeHeader from '../components/layout/HomeHeader/HomeHeader';
+import { businessService } from '../services/api';
 
 // Constants
 import { SPACING } from '../constants/spacing';
@@ -18,7 +19,33 @@ import { useTheme } from '../hooks/useTheme';
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [nearYouBusinesses, setNearYouBusinesses] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const { colors } = useTheme();
+
+  React.useEffect(() => {
+    fetchNearYouBusinesses();
+  }, []);
+
+  const fetchNearYouBusinesses = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await businessService.getAllBusinesses();
+      if (response && response.success && Array.isArray(response.data)) {
+        setNearYouBusinesses(response.data);
+      } else {
+        setNearYouBusinesses([]);
+      }
+    } catch (err) {
+      console.error('Error fetching businesses:', err);
+      setError('Failed to load businesses');
+      setNearYouBusinesses([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Mock data - replace with API calls later
   const promotions = [
@@ -84,16 +111,22 @@ const HomeScreen = () => {
     },
   ];
 
-  const renderBusiness = ({ item }) => (
-    <BusinessCard
-      name={item.name}
-      category={item.category}
-      rating={item.rating}
-      distance={item.distance}
-      image={item.image}
-      onPress={() => navigation.navigate('Business', { business: item })}
-    />
-  );
+  const renderBusiness = ({ item }) => {
+    // Basic null safety for the mapping
+    const firstBranch = item?.branches?.[0];
+    const imageUrl = firstBranch?.first_image_url;
+
+    return (
+      <BusinessCard
+        name={item?.name || 'Unknown Business'}
+        category={item?.category || 'General'} // Use category if available, otherwise fallback
+        rating={item?.average_rating || 0}
+        distance={firstBranch?.address ? firstBranch.address.split(',')[0] : 'Distance N/A'}
+        image={imageUrl ? { uri: imageUrl } : null}
+        onPress={() => navigation.navigate('Business', { business: item })}
+      />
+    );
+  };
 
   return (
     <SafeAreaView
@@ -126,18 +159,36 @@ const HomeScreen = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Near You</Text>
-            <TouchableOpacity>
-              <Text style={[styles.seeAll, { color: colors.primary }]}>See All</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('BusinessList')}>
+              <Text style={[styles.seeAll, { color: colors.primary }]}>
+                {isLoading ? 'Loading...' : 'See All'}
+              </Text>
             </TouchableOpacity>
           </View>
-          <FlatList
-            data={businesses}
-            renderItem={renderBusiness}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.businessesList}
-          />
+          {error ? (
+            <View style={styles.errorContainer}>
+              <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
+              <TouchableOpacity onPress={fetchNearYouBusinesses}>
+                <Text style={[styles.retryText, { color: colors.primary }]}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <FlatList
+              data={nearYouBusinesses.slice(0, 4)}
+              renderItem={renderBusiness}
+              keyExtractor={(item) => item?.id?.toString() || Math.random().toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.businessesList}
+              ListEmptyComponent={
+                !isLoading && (
+                  <Text style={[styles.emptyText, { color: colors.textLight }]}>
+                    No businesses found nearby
+                  </Text>
+                )
+              }
+            />
+          )}
         </View>
 
         {/* Categories Section */}
@@ -220,6 +271,21 @@ const styles = StyleSheet.create({
   businessesList: {
     paddingHorizontal: SPACING.md,
     gap: SPACING.md,
+  },
+  errorContainer: {
+    padding: SPACING.md,
+    alignItems: 'center',
+  },
+  errorText: {
+    fontFamily: TYPOGRAPHY.fontFamily.medium,
+    marginBottom: SPACING.xs,
+  },
+  retryText: {
+    fontFamily: TYPOGRAPHY.fontFamily.semibold,
+  },
+  emptyText: {
+    fontFamily: TYPOGRAPHY.fontFamily.medium,
+    paddingHorizontal: SPACING.md,
   },
 });
 

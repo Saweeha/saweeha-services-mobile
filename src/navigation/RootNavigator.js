@@ -10,6 +10,7 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 import HelpSupportScreen from '../screens/HelpSupportScreen';
 import AboutScreen from '../screens/AboutScreen';
 import FAQScreen from '../screens/FAQScreen';
+import BusinessListScreen from '../screens/BusinessListScreen';
 import { getHeaderOptions } from './headerConfig';
 
 const Stack = createNativeStackNavigator();
@@ -40,20 +41,20 @@ const RootNavigator = () => {
         return getHeaderOptions(navigation, route);
       }}
     >
-      <Stack.Screen 
-        name="MainTabs" 
-        component={TabNavigator} 
-        options={{ headerShown: false }} 
+      <Stack.Screen
+        name="MainTabs"
+        component={TabNavigator}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-        name="Notifications" 
+      <Stack.Screen
+        name="Notifications"
         component={NotificationsScreen}
-        options={{ 
+        options={{
           title: 'Notifications',
         }}
       />
-      <Stack.Screen 
-        name="Business" 
+      <Stack.Screen
+        name="Business"
         component={BusinessScreen}
         options={{
           // Title is read dynamically from route.params in headerConfig
@@ -61,36 +62,43 @@ const RootNavigator = () => {
           title: 'Business',
         }}
       />
-      <Stack.Screen 
-        name="BookingDateTime" 
+      <Stack.Screen
+        name="BookingDateTime"
         component={BookingDateTimeScreen}
         options={{
           title: 'Select Date & Time',
         }}
       />
-      <Stack.Screen 
-        name="EditProfile" 
+      <Stack.Screen
+        name="EditProfile"
         component={EditProfileScreen}
         options={{
           title: 'Edit Profile',
         }}
       />
-      <Stack.Screen 
-        name="HelpSupport" 
+      <Stack.Screen
+        name="HelpSupport"
         component={HelpSupportScreen}
         options={{
           title: 'Help & Support',
         }}
       />
-      <Stack.Screen 
-        name="About" 
+      <Stack.Screen
+        name="About"
         component={AboutScreen}
         options={{
           title: 'About',
         }}
       />
-      <Stack.Screen 
-        name="FAQ" 
+      <Stack.Screen
+        name="BusinessList"
+        component={BusinessListScreen}
+        options={{
+          title: 'All Businesses',
+        }}
+      />
+      <Stack.Screen
+        name="FAQ"
         component={FAQScreen}
         options={{
           title: 'FAQs',

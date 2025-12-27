@@ -22,8 +22,9 @@
 10. [Category Endpoints](#category-endpoints)
 11. [Service Endpoints](#service-endpoints)
 12. [Professional Endpoints](#professional-endpoints)
-13. [Booking Endpoints](#booking-endpoints)
-14. [Health Check](#health-check)
+14. [Review Endpoints](#review-endpoints)
+15. [Favorite Endpoints](#favorite-endpoints)
+16. [Health Check](#health-check)
 
 ---
 
@@ -830,6 +831,39 @@ Authorization: Bearer <token>
 
 ## Business Endpoints
 
+### List All Businesses
+
+**GET** `/api/business/all`
+
+**Access:** Public
+
+**Description:** Gets all active businesses with their branches and average ratings. This is a public endpoint intended for customer-facing applications. Each branch includes only its name, address, and first image.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Businesses fetched successfully",
+  "data": [
+    {
+      "id": 1,
+      "name": "Lumière Salon",
+      "average_rating": 4.8,
+      "branches": [
+        {
+          "name": "Downtown Branch",
+          "address": "123 Main St",
+          "first_image_url": "https://bucket.s3.region.amazonaws.com/branches/1/thumbnail.jpg"
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+
 ### Create Business
 
 **POST** `/api/business`
@@ -1296,9 +1330,21 @@ Authorization: Bearer <token>
         "id": 5,
         "business_id": 10,
         "name": "Downtown Branch",
-        "address": "123 Main St",
+        "location_url": "https://maps.google.com/?q=123+Main+St",
         "is_public": true,
-        "is_active": true
+        "is_active": true,
+        "average_rating": 4.5,
+        "images": [
+          {
+            "id": 1,
+            "branch_id": 5,
+            "original_url": "https://bucket.s3.region.amazonaws.com/branches/5/images/1700000000000/original.jpg",
+            "thumbnail_url": "https://bucket.s3.region.amazonaws.com/branches/5/images/1700000000000/thumbnail.jpg",
+            "sort_order": 0,
+            "created_at": "2024-01-01T12:00:00.000Z",
+            "updated_at": "2024-01-01T12:00:00.000Z"
+          }
+        ]
       }
     ]
   }
@@ -1358,10 +1404,46 @@ Authorization: Bearer <token>  // Optional, required for private branches
   "success": true,
   "message": "Branch retrieved successfully",
   "data": {
-    "branch": { ... }
+    "branch": {
+      "id": 11,
+      "business_id": 10,
+      "name": "Main Test Branch",
+      "address": "123 Main St",
+      "location_url": "https://maps.google.com/?q=123+Main+St",
+      "is_public": true,
+      "is_active": true,
+      "average_rating": 4.5,
+      "reviews": [
+        {
+          "id": 1,
+          "user_id": 53,
+          "user_name": "John Doe",
+          "branch_id": 11,
+          "rating": 5,
+          "review": "Excellent service!",
+          "created_at": "2024-01-01T12:00:00.000Z",
+          "updated_at": "2024-01-01T12:00:00.000Z"
+        }
+      ],
+      "images": [
+        {
+          "id": 1,
+          "branch_id": 11,
+          "original_url": "https://bucket.s3.region.amazonaws.com/branches/11/images/1700000000000/original.jpg",
+          "thumbnail_url": "https://bucket.s3.region.amazonaws.com/branches/11/images/1700000000000/thumbnail.jpg",
+          "sort_order": 0,
+          "created_at": "2024-01-01T12:00:00.000Z",
+          "updated_at": "2024-01-01T12:00:00.000Z"
+        }
+      ],
+      "created_at": "2024-01-01T12:00:00.000Z",
+      "updated_at": "2024-01-01T12:00:00.000Z"
+    }
   }
 }
 ```
+
+**Note:** `average_rating` is `null` if the branch has no reviews. `reviews` is an array of review objects or `null` if no reviews are present. `images` is an array of image objects or `null` if no images are present.
 
 ---
 
@@ -1561,6 +1643,63 @@ Authorization: Bearer <token>
 ```
 
 ---
+ 
+ ### Upload Branch Image
+ 
+ **POST** `/api/branches/:id/images`
+ 
+ **Headers:**
+ ```
+ Authorization: Bearer <token>
+ Content-Type: multipart/form-data
+ ```
+ 
+ **Access:** Business Admin, Super Admin
+ 
+ **Request Body:**
+ ```
+ image: [file]  // Required - Image file (JPEG/PNG/WebP, max 5MB)
+ ```
+ 
+ **Response (201):**
+ ```json
+ {
+   "success": true,
+   "message": "Branch image uploaded successfully",
+   "data": {
+     "id": 1,
+     "branch_id": 11,
+     "original_url": "...",
+     "thumbnail_url": "...",
+     "sort_order": 0,
+     "created_at": "...",
+     "updated_at": "..."
+   }
+ }
+ ```
+ 
+ ---
+ 
+ ### Delete Branch Image
+ 
+ **DELETE** `/api/branches/:id/images/:imageId`
+ 
+ **Headers:**
+ ```
+ Authorization: Bearer <token>
+ ```
+ 
+ **Access:** Business Admin, Super Admin
+ 
+ **Response (200):**
+ ```json
+ {
+   "success": true,
+   "message": "Branch image deleted successfully"
+ }
+ ```
+ 
+ ---
 
 ## Category Endpoints
 
@@ -2832,6 +2971,145 @@ Authorization: Bearer <token>
 **Notes:**
 - Completed bookings cannot be cancelled.
 - Cancellation is performed inside a transaction and an audit log entry is created, but logging failures do not block the operation.
+
+---
+
+## Review Endpoints
+
+### Create Review
+
+**POST** `/api/reviews`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Access:** Authenticated users
+
+**Description:** Creates a new review and rating for a branch.
+
+**Request Body:**
+```json
+{
+  "branchId": 11,
+  "rating": 5,      // Integer 1-5
+  "review": "Great service!"  // Optional
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Review created successfully",
+  "data": {
+    "review": {
+      "id": 1,
+      "user_id": 53,
+      "user_name": "John Doe",
+      "branch_id": 11,
+      "rating": 5,
+      "review": "Great service!",
+      "created_at": "2024-01-01T12:00:00.000Z",
+      "updated_at": "2024-01-01T12:00:00.000Z"
+    }
+  }
+}
+```
+
+---
+
+## Favorite Endpoints
+
+### Add Favorite
+
+**POST** `/api/favorites`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Access:** Authenticated users
+
+**Description:** Adds a business to the user's favorites list.
+
+**Request Body:**
+```json
+{
+  "businessId": 10
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Business added to favorites",
+  "data": {
+    "id": 1,
+    "user_id": 53,
+    "business_id": 10,
+    "created_at": "2024-01-01T12:00:00.000Z"
+  }
+}
+```
+
+---
+
+### Remove Favorite
+
+**DELETE** `/api/favorites/:businessId`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Access:** Authenticated users
+
+**Description:** Removes a business from the user's favorites list.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Business removed from favorites"
+}
+```
+
+---
+
+### Get Favorites
+
+**GET** `/api/favorites`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Access:** Authenticated users
+
+**Description:** Retrieves all businesses favorited by the current user.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 10,
+      "name": "My Business",
+      "is_active": true,
+      "favorited_at": "2024-01-01T12:00:00.000Z",
+      "created_at": "2023-12-01T10:00:00.000Z",
+      "updated_at": "2023-12-01T10:00:00.000Z"
+    }
+  ]
+}
+```
 
 ---
 

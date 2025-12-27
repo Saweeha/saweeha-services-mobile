@@ -54,9 +54,9 @@ const ServiceListItem = React.memo(
           )}
 
           {isSelected && selectedProfessional && (
-            <View style={[styles.professionalBadge, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="person" size={14} color={colors.primary} />
-              <Text style={[styles.professionalText, { color: colors.primary }]} numberOfLines={1}>
+            <View style={[styles.professionalBadge, { backgroundColor: colors.primary }]}>
+              <Ionicons name="person" size={14} color={colors.textWhite} />
+              <Text style={[styles.professionalText, { color: colors.textWhite }]} numberOfLines={1}>
                 {selectedProfessional.name}
               </Text>
             </View>
