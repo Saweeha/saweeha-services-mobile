@@ -16,11 +16,9 @@ import ProgressiveImage from '../components/ui/ProgressiveImage/ProgressiveImage
 const ProfileScreen = () => {
   const { scheme, colors, toggleScheme } = useTheme();
   const dispatch = useDispatch();
-  const { isAuthenticated, user, loading } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const navigation = useNavigation();
   const isDark = scheme === 'dark';
-
-  console.log('ProfileScreen Rendering - Auth State:', { isAuthenticated, hasUser: !!user, loading });
 
   const handleItemPress = (item) => {
     if (item.type === 'switch') {

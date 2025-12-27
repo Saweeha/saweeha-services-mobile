@@ -27,13 +27,10 @@ SplashScreen.preventAutoHideAsync();
 const AppContent = () => {
   const { scheme } = useTheme();
   const dispatch = useDispatch();
-  const { hasShownLaunchModal, isAuthenticated, user, loading } = useSelector((state) => state.auth);
-
-  console.log('App Rendering - Auth State:', { isAuthenticated, hasUser: !!user, loading, hasShownLaunchModal });
+  const { hasShownLaunchModal } = useSelector((state) => state.auth);
 
   // Check auth status on app launch
   useEffect(() => {
-    console.log('App Mounting - calling checkAuthStatus');
     dispatch(checkAuthStatus());
   }, [dispatch]);
 

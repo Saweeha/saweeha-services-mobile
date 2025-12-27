@@ -10,8 +10,7 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await authService.login(email, password);
-      console.log('Login response:', JSON.stringify(response, null, 2));
-      // Store tokens only (not user data)
+
       if (response.success && response.data.token) {
         await AsyncStorage.setItem('token', response.data.token);
         await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
@@ -28,8 +27,7 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await authService.register(userData);
-      console.log('Register response:', JSON.stringify(response, null, 2));
-      // Store tokens from registration (needed for email verification)
+
       if (response.success && response.data.token) {
         await AsyncStorage.setItem('token', response.data.token);
         await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
@@ -93,7 +91,7 @@ export const checkAuthStatus = createAsyncThunk(
       if (!token) return rejectWithValue('No token found');
 
       const response = await authService.getCurrentUser();
-      console.log('CheckAuthStatus response:', JSON.stringify(response, null, 2));
+
       if (response.success) {
         return response.data;
       } else {
@@ -289,7 +287,6 @@ const authSlice = createSlice({
         // checkAuthStatus thunk returns response.data, which is { user: { ... } }
         // BUT let's be safe and check if it's already unwrapped or not
         state.user = action.payload?.user || action.payload;
-        console.log('checkAuthStatus.fulfilled - assigned user:', !!state.user);
       })
       .addCase(checkAuthStatus.rejected, (state, action) => {
         state.loading = false;
