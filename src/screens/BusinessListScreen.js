@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import BusinessCard from '../components/cards/BusinessCard/BusinessCard';
 
 // Services & Constants
-import { businessService } from '../services/api';
+import { businessService } from '../services/businessService';
 import { useTheme } from '../hooks/useTheme';
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';

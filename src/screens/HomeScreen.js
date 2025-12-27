@@ -8,7 +8,7 @@ import PromotionSwiper from '../components/media/PromotionSwiper/PromotionSwiper
 import CategoryCard from '../components/cards/CategoryCard/CategoryCard';
 import BusinessCard from '../components/cards/BusinessCard/BusinessCard';
 import HomeHeader from '../components/layout/HomeHeader/HomeHeader';
-import { businessService } from '../services/api';
+import { businessService } from '../services/businessService';
 
 // Constants
 import { SPACING } from '../constants/spacing';
