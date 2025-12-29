@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, FlatList, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
@@ -22,13 +22,13 @@ const HomeScreen = () => {
   const [nearYouBusinesses, setNearYouBusinesses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { colors } = useTheme();
+  const { colors, scheme } = useTheme();
 
   React.useEffect(() => {
     fetchNearYouBusinesses();
   }, []);
 
-  const fetchNearYouBusinesses = async () => {
+  const fetchNearYouBusinesses = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -44,8 +44,17 @@ const HomeScreen = () => {
       setNearYouBusinesses([]);
     } finally {
       setIsLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, []);
+
+  // Pull-to-refresh state and handler
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchNearYouBusinesses();
+  }, [fetchNearYouBusinesses]);
 
   // Mock data - replace with API calls later
   const promotions = [
@@ -114,7 +123,7 @@ const HomeScreen = () => {
   const renderBusiness = ({ item }) => {
     // Basic null safety for the mapping
     const firstBranch = item?.branches?.[0];
-    const imageUrl = firstBranch?.first_image_url;
+    const imageObj = firstBranch?.images?.[0];
 
     return (
       <BusinessCard
@@ -122,7 +131,7 @@ const HomeScreen = () => {
         category={item?.category || 'General'} // Use category if available, otherwise fallback
         rating={item?.average_rating || 0}
         distance={firstBranch?.address ? firstBranch.address.split(',')[0] : 'Distance N/A'}
-        image={imageUrl ? { uri: imageUrl } : null}
+        image={imageObj}
         onPress={() => navigation.navigate('Business', { business: item })}
       />
     );
@@ -137,6 +146,15 @@ const HomeScreen = () => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.text}
+            colors={[colors.primary]}
+            progressBackgroundColor={scheme === 'dark' ? '#334155' : '#FFFFFF'}
+          />
+        }
       >
         <HomeHeader
           title="Discover"

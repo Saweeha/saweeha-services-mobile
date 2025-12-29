@@ -1,5 +1,8 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { View, StyleSheet, Text, ActivityIndicator, RefreshControl } from 'react-native';
+
+// Services
+import businessService from '../services/businessService';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
@@ -26,7 +29,7 @@ import { useTheme } from '../hooks/useTheme';
 const BusinessScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { colors } = useTheme();
+  const { colors, scheme } = useTheme();
   const [activeTab, setActiveTab] = useState('services');
   const [selectedServices, setSelectedServices] = useState([]);
   const [activeServiceCategory, setActiveServiceCategory] = useState('all');
@@ -34,10 +37,16 @@ const BusinessScreen = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [isAtBottom, setIsAtBottom] = useState(false);
 
-  // Get business data from route params or use mock data
-  const routeBusiness = route.params?.business;
+  // API state
+  const [businessData, setBusinessData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedBranchId, setSelectedBranchId] = useState(null);
 
-  // All available business images
+  // Get business ID from route params
+  const businessId = route.params?.business?.id;
+
+  // All available business images (fallback images)
   const allBusinessImages = [
     require('../../assets/businesses/pexels-delbeautybox-211032-705255.jpg'),
     require('../../assets/businesses/pexels-delbeautybox-211032-853427.jpg'),
@@ -46,55 +55,103 @@ const BusinessScreen = () => {
     require('../../assets/businesses/pexels-cottonbro-3992874.jpg'),
   ];
 
-  // Mock branches data
-  const mockBranches = [
-    {
-      id: '1',
-      name: 'Downtown Branch',
-      address: '123 Main Street, Downtown',
-      phone: '+962 6 123 4567',
-    },
-    {
-      id: '2',
-      name: 'Mall Branch',
-      address: '456 Shopping Mall, Level 2',
-      phone: '+962 6 234 5678',
-    },
-    {
-      id: '3',
-      name: 'Airport Branch',
-      address: '789 Airport Road, Terminal 1',
-      phone: '+962 6 345 6789',
-    },
-  ];
-
-  // Build business object
-  const business = useMemo(() => {
-    if (routeBusiness) {
-      return {
-        id: routeBusiness.id,
-        name: routeBusiness.name || 'Elite Beauty Salon',
-        category: routeBusiness.category,
-        rating: routeBusiness.rating || 4.8,
-        distance: routeBusiness.distance,
-        image: routeBusiness.image || allBusinessImages[0],
-        branches: mockBranches,
-        images: routeBusiness.image 
-          ? [routeBusiness.image, ...allBusinessImages.filter(img => img !== routeBusiness.image)]
-          : allBusinessImages,
-      };
+  // Fetch business details from API
+  const fetchBusinessDetails = useCallback(async () => {
+    if (!businessId) {
+      setLoading(false);
+      setError('No business ID provided');
+      return;
     }
-    
+
+    try {
+      setError(null);
+      const response = await businessService.getBusinessById(businessId);
+
+      if (response?.success && response?.data) {
+        setBusinessData(response.data);
+        // Initialize selected branch ID if not set
+        if (!selectedBranchId && response.data.branches?.length > 0) {
+          setSelectedBranchId(response.data.branches[0].id);
+        }
+      } else {
+        setError('Failed to load business details');
+      }
+    } catch (err) {
+      console.error('Error fetching business details:', err);
+      setError(err?.message || 'Failed to load business details');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [businessId]);
+
+  // Initial load
+  useEffect(() => {
+    setLoading(true);
+    fetchBusinessDetails();
+  }, [fetchBusinessDetails]);
+
+  // Pull-to-refresh state and handler
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchBusinessDetails();
+  }, [fetchBusinessDetails]);
+
+  // Get the selected branch data (with full details) from API response
+  const selectedBranch = useMemo(() => {
+    const branches = businessData?.branches;
+    if (!branches || !Array.isArray(branches) || branches.length === 0) {
+      return null;
+    }
+    if (!selectedBranchId) return branches[0];
+    return branches.find(b => b.id === selectedBranchId) || branches[0];
+  }, [businessData, selectedBranchId]);
+
+  // Build business object with null safety
+  const business = useMemo(() => {
+    // Get business images from selected branch, with fallback to default images
+    const branchImages = selectedBranch?.images || [];
+    const imageUrls = branchImages
+      .filter(img => img?.original_url)
+      .map(img => ({
+        uri: img.original_url,
+        thumbnail: img.thumbnail_url || null
+      }));
+
+    // For API images, include both uri and thumbnail for progressive loading
+    const images = imageUrls.length > 0
+      ? imageUrls
+      : allBusinessImages.map(img => ({ source: img, thumbnail: null }));
+
+    const firstImage = imageUrls.length > 0
+      ? { uri: imageUrls[0].uri, thumbnail: imageUrls[0].thumbnail }
+      : { source: allBusinessImages[0], thumbnail: null };
+
     return {
-      id: '1',
-      name: 'Elite Beauty Salon',
-      rating: 4.8,
-      category: 'Beauty Salon',
-      branches: mockBranches,
-      images: allBusinessImages,
-      image: allBusinessImages[0],
+      id: businessData?.id || businessId || null,
+      name: businessData?.name || 'Unknown Business',
+      about: businessData?.about || '',
+      opening_hours: businessData?.opening_hours || null,
+      rating: selectedBranch?.average_rating || 0,
+      branches: (businessData?.branches || []).map(branch => ({
+        id: branch?.id || null,
+        name: branch?.name || 'Unknown Branch',
+        address: branch?.address || '',
+        location_url: branch?.location_url || null,
+        average_rating: branch?.average_rating || null,
+      })),
+      images: images,
+      image: firstImage,
+      // branch specific data
+      selectedBranchId: selectedBranch?.id || null,
+      selectedBranch: selectedBranch,
+      categories: selectedBranch?.categories || [],
+      professionals: selectedBranch?.professionals || [],
+      reviews: selectedBranch?.reviews || [],
     };
-  }, [routeBusiness]);
+  }, [businessData, selectedBranch, businessId, allBusinessImages]);
 
   // Note: Header title is now managed entirely by navigation via route params
   // No screen-level header configuration allowed per design constraints
@@ -106,212 +163,145 @@ const BusinessScreen = () => {
     { id: 'about', label: 'About' },
   ];
 
-  // Service categories
-  const serviceCategories = [
-    { id: 'all', label: 'All' },
-    { id: 'featured', label: 'Featured' },
-    { id: 'packages', label: 'Packages' },
-    { id: 'facial', label: 'Facial' },
-    { id: 'haircare', label: 'Haircare' },
-    { id: 'nailcare', label: 'Nail Care' },
-  ];
+  // Service categories - dynamically built from API data
+  const serviceCategories = useMemo(() => {
+    const categories = [{ id: 'all', label: 'All' }];
 
-  // Mock services data
-  const mockServices = [
-    {
-      id: '1',
-      title: 'Hair And Beard Cut',
-      duration: '1 hr',
-      price: '15 JD',
-      category: 'haircare',
-      description: 'Professional haircut and beard grooming',
-      isFeatured: true,
-    },
-    {
-      id: '2',
-      title: 'Haircut',
-      duration: '45 mins',
-      price: '10 JD',
-      category: 'haircare',
-      description: 'Classic men\'s haircut',
-      isFeatured: true,
-    },
-    {
-      id: '3',
-      title: 'Styling',
-      duration: '10 mins',
-      price: '5 JD',
-      category: 'haircare',
-      description: 'Professional hair styling',
-      isFeatured: true,
-    },
-    {
-      id: '4',
-      title: 'Full Grooming Package',
-      duration: '2 hrs',
-      price: '35 JD',
-      category: 'packages',
-      description: 'Complete grooming experience',
-      isFeatured: true,
-    },
-    {
-      id: '5',
-      title: 'Premium Facial Treatment',
-      duration: '1.5 hrs',
-      price: '45 JD',
-      category: 'facial',
-      description: 'Deep cleansing and hydration',
-      isFeatured: true,
-    },
-    {
-      id: '6',
-      title: 'Gel Manicure & Pedicure',
-      duration: '1.5 hrs',
-      price: '55 JD',
-      category: 'nailcare',
-      description: 'Long-lasting gel finish',
-      isFeatured: false,
-    },
-    {
-      id: '7',
-      title: 'Beard Trim',
-      duration: '30 mins',
-      price: '8 JD',
-      category: 'haircare',
-      description: 'Professional beard trimming',
-      isFeatured: false,
-    },
-    {
-      id: '8',
-      title: 'Deep Cleansing Facial',
-      duration: '1 hr',
-      price: '30 JD',
-      category: 'facial',
-      description: 'Deep pore cleansing facial',
-      isFeatured: false,
-    },
-    {
-      id: '9',
-      title: 'Classic Manicure',
-      duration: '45 mins',
-      price: '20 JD',
-      category: 'nailcare',
-      description: 'Classic nail care service',
-      isFeatured: false,
-    },
-  ];
+    (business.categories || []).forEach(category => {
+      if (category?.id && category?.is_active) {
+        categories.push({
+          id: String(category.id),
+          label: category.name || `Category ${category.id}`
+        });
+      }
+    });
+
+    return categories;
+  }, [business.categories]);
+
+  // Normalize API services for UI (with null safety)
+  const normalizedServices = useMemo(() => {
+    const allServices = [];
+
+    (business.categories || []).forEach(category => {
+      if (category?.services && Array.isArray(category.services)) {
+        category.services.forEach(service => {
+          allServices.push({
+            id: service?.id || Math.random().toString(),
+            title: service?.name || 'Unknown Service',
+            duration: service?.duration_minutes ? `${service.duration_minutes} mins` : 'N/A',
+            price: service?.price ? `${parseFloat(service.price).toFixed(0)} JD` : 'N/A',
+            category: String(category.id),
+            description: service?.description || '',
+            isFeatured: false,
+          });
+        });
+      }
+    });
+
+    return allServices;
+  }, [business.categories]);
 
   // Filter services based on selected category
   const filteredServices = useMemo(() => {
     if (activeServiceCategory === 'all') {
-      return mockServices;
+      return normalizedServices;
     }
-    if (activeServiceCategory === 'featured') {
-      return mockServices.filter(service => service.isFeatured);
+    return normalizedServices.filter(service => service.category === activeServiceCategory);
+  }, [activeServiceCategory, normalizedServices]);
+
+  // Normalize team members from API (with null safety)
+  const teamMembers = useMemo(() => {
+    return (business.professionals || []).map(professional => ({
+      id: professional?.id || Math.random().toString(),
+      name: professional?.name || 'Unknown Professional',
+      role: professional?.role || 'Staff',
+      image: professional?.profile_picture_url
+        ? { uri: professional.profile_picture_url }
+        : null,
+      thumbnail: professional?.profile_picture_thumbnail_url
+        ? { uri: professional.profile_picture_thumbnail_url }
+        : null,
+    }));
+  }, [business.professionals]);
+
+  // Normalize reviews from API (with null safety)
+  const reviews = useMemo(() => {
+    return (business.reviews || []).map(review => ({
+      id: review?.id || Math.random().toString(),
+      userName: review?.user_name || 'Anonymous',
+      rating: review?.rating || 0,
+      date: review?.created_at ? formatRelativeDate(review.created_at) : '',
+      comment: review?.review || '',
+      userImage: review?.profile_picture_url
+        ? { uri: review.profile_picture_url }
+        : null,
+    }));
+  }, [business.reviews]);
+
+  // Helper function to format relative dates
+  const formatRelativeDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
+      return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''} ago`;
+    } catch {
+      return '';
     }
-    return mockServices.filter(service => service.category === activeServiceCategory);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeServiceCategory]);
+  };
 
-  // Mock team members data
-  const mockTeam = [
-    {
-      id: '1',
-      name: 'Ahmed Al-Mansoori',
-      role: 'Senior Stylist',
-      experience: 8,
-      specialties: ['Haircuts', 'Styling', 'Coloring'],
-    },
-    {
-      id: '2',
-      name: 'Sarah Johnson',
-      role: 'Beauty Specialist',
-      experience: 5,
-      specialties: ['Facial', 'Skincare', 'Makeup'],
-    },
-    {
-      id: '3',
-      name: 'Mohammed Hassan',
-      role: 'Master Barber',
-      experience: 12,
-      specialties: ['Beard Grooming', 'Classic Cuts', 'Hot Towel Shave'],
-    },
-    {
-      id: '4',
-      name: 'Layla Al-Zahra',
-      role: 'Nail Art Specialist',
-      experience: 6,
-      specialties: ['Manicure', 'Pedicure', 'Nail Art'],
-    },
-  ];
+  // Helper function to format opening hours
+  const formatOpeningHours = (hours) => {
+    if (!hours) return 'Hours not available';
 
-  // Mock reviews data
-  const mockReviews = [
-    {
-      id: '1',
-      userName: 'Omar Ali',
-      rating: 5,
-      date: '2 days ago',
-      service: 'Haircut',
-      comment: 'Excellent service! The stylist was very professional and the result exceeded my expectations. Highly recommended!',
-    },
-    {
-      id: '2',
-      userName: 'Fatima Ahmed',
-      rating: 5,
-      date: '1 week ago',
-      service: 'Facial Treatment',
-      comment: 'Amazing experience! My skin feels so refreshed and the staff was very friendly and knowledgeable.',
-    },
-    {
-      id: '3',
-      userName: 'Khalid Ibrahim',
-      rating: 4,
-      date: '2 weeks ago',
-      service: 'Beard Trim',
-      comment: 'Great service overall. The barber was skilled and the atmosphere was relaxing. Will definitely come back.',
-    },
-    {
-      id: '4',
-      userName: 'Noor Al-Din',
-      rating: 5,
-      date: '3 weeks ago',
-      service: 'Full Grooming Package',
-      comment: 'Best grooming experience I\'ve had! Everything was perfect from start to finish. Worth every penny.',
-    },
-  ];
-
-  // Map service categories to professional specialties
-  const getMatchingSpecialties = (serviceCategory) => {
-    const categoryMap = {
-      haircare: ['Haircuts', 'Styling', 'Beard Grooming', 'Classic Cuts', 'Coloring'],
-      facial: ['Facial', 'Skincare', 'Makeup'],
-      nailcare: ['Manicure', 'Pedicure', 'Nail Art'],
-      packages: ['Haircuts', 'Styling', 'Beard Grooming', 'Classic Cuts', 'Facial', 'Skincare', 'Manicure', 'Pedicure'],
+    const dayNames = {
+      monday: 'Monday',
+      tuesday: 'Tuesday',
+      wednesday: 'Wednesday',
+      thursday: 'Thursday',
+      friday: 'Friday',
+      saturday: 'Saturday',
+      sunday: 'Sunday',
     };
-    return categoryMap[serviceCategory] || [];
+
+    const lines = [];
+    Object.entries(dayNames).forEach(([key, name]) => {
+      const dayHours = hours[key];
+      if (!dayHours || dayHours.is_closed) {
+        lines.push(`${name}: Closed`);
+      } else if (dayHours.ranges && dayHours.ranges.length > 0) {
+        const timeRanges = dayHours.ranges
+          .map(r => `${r.start || '?'} - ${r.end || '?'}`)
+          .join(', ');
+        lines.push(`${name}: ${timeRanges}`);
+      } else {
+        lines.push(`${name}: Closed`);
+      }
+    });
+
+    return lines.join('\n');
   };
 
-  // Filter professionals based on service category
-  const getAvailableProfessionals = (service) => {
+  // Get available professionals for a service
+  // Note: Since API data doesn't have specialty matching, 
+  // we return all professionals from the branch
+  const getAvailableProfessionals = useCallback((service) => {
     if (!service) return [];
-    
-    const matchingSpecialties = getMatchingSpecialties(service.category);
-    
-    return mockTeam.filter(professional => {
-      return professional.specialties.some(specialty =>
-        matchingSpecialties.some(match => 
-          specialty.toLowerCase().includes(match.toLowerCase()) ||
-          match.toLowerCase().includes(specialty.toLowerCase())
-        )
-      );
-    });
-  };
+    // Return all team members since API doesn't provide specialty filtering
+    return teamMembers;
+  }, [teamMembers]);
 
   // Handle service press - open professional selection modal or unselect if already selected
   const handleServicePress = (service) => {
     const existingService = selectedServices.find(s => s.id === service.id);
-    
+
     if (existingService) {
       // If service is already selected, unselect it
       setSelectedServices(prev => prev.filter(s => s.id !== service.id));
@@ -325,7 +315,7 @@ const BusinessScreen = () => {
   // Handle long press - allow changing professional for already selected service
   const handleServiceLongPress = (service) => {
     const existingService = selectedServices.find(s => s.id === service.id);
-    
+
     if (existingService) {
       // Open modal to change professional
       setSelectedService(service);
@@ -345,7 +335,7 @@ const BusinessScreen = () => {
     setSelectedServices(prev => {
       const exists = prev.find(s => s.id === selectedService.id);
       if (exists) {
-        return prev.map(s => 
+        return prev.map(s =>
           s.id === selectedService.id ? serviceWithProfessional : s
         );
       }
@@ -357,15 +347,23 @@ const BusinessScreen = () => {
   const handleScroll = useCallback((event) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     const paddingToBottom = 100; // Threshold for "at bottom"
-    const isBottom = 
+    const isBottom =
       layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
     setIsAtBottom(isBottom);
   }, []);
 
-  // Handle continue button press
+  // Handle branch selection
+  const handleBranchSelect = (branch) => {
+    setSelectedBranchId(branch.id);
+    // Clear selected services when switching branches as services might differ
+    setSelectedServices([]);
+    // Reset service category filter
+    setActiveServiceCategory('all');
+  };
+
   const handleContinue = () => {
     if (selectedServices.length === 0) return;
-    
+
     // Check auth before navigating - handled by RootNavigator listener
     navigation.navigate('BookingDateTime', {
       selectedServices,
@@ -386,17 +384,17 @@ const BusinessScreen = () => {
             {filteredServices.map((service) => {
               const selectedServiceData = selectedServices.find(s => s.id === service.id);
               return (
-              <ServiceListItem
-                key={service.id}
-                title={service.title}
-                duration={service.duration}
-                price={service.price}
-                description={service.description}
+                <ServiceListItem
+                  key={service.id}
+                  title={service.title}
+                  duration={service.duration}
+                  price={service.price}
+                  description={service.description}
                   isSelected={!!selectedServiceData}
                   selectedProfessional={selectedServiceData?.selectedProfessional}
                   onPress={() => handleServicePress(service)}
                   onLongPress={() => handleServiceLongPress(service)}
-              />
+                />
               );
             })}
           </View>
@@ -405,32 +403,43 @@ const BusinessScreen = () => {
       case 'team':
         return (
           <View style={styles.tabContent}>
-            <View style={styles.teamGrid}>
-              {mockTeam.map((member) => (
-                <TeamMemberCard
-                  key={member.id}
-                  name={member.name}
-                  role={member.role}
-                  image={member.image}
-                />
-              ))}
-            </View>
+            {teamMembers.length === 0 ? (
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                No team members available
+              </Text>
+            ) : (
+              <View style={styles.teamGrid}>
+                {teamMembers.map((member) => (
+                  <TeamMemberCard
+                    key={member.id}
+                    name={member.name}
+                    role={member.role}
+                    image={member.image}
+                  />
+                ))}
+              </View>
+            )}
           </View>
         );
 
       case 'reviews':
         return (
           <View style={styles.tabContent}>
-            {mockReviews.map((review) => (
-              <ReviewListItem
-                key={review.id}
-                userName={review.userName}
-                rating={review.rating}
-                date={review.date}
-                service={review.service}
-                comment={review.comment}
-              />
-            ))}
+            {reviews.length === 0 ? (
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                No reviews yet
+              </Text>
+            ) : (
+              reviews.map((review) => (
+                <ReviewListItem
+                  key={review.id}
+                  userName={review.userName}
+                  rating={review.rating}
+                  date={review.date}
+                  comment={review.comment}
+                />
+              ))
+            )}
           </View>
         );
 
@@ -440,17 +449,19 @@ const BusinessScreen = () => {
             <InfoCard
               icon="information-circle-outline"
               title="About"
-              content="We are a premier beauty and wellness salon dedicated to providing exceptional services that enhance your natural beauty and boost your confidence. With years of experience and a team of skilled professionals, we offer a wide range of services tailored to meet your unique needs."
+              content={business.about || 'No description available.'}
             />
-            <InfoCard
-              icon="time-outline"
-              title="Operating Hours"
-              content="Sunday - Thursday: 9:00 AM - 9:00 PM\nFriday - Saturday: 10:00 AM - 10:00 PM"
-            />
+            {business.opening_hours && (
+              <InfoCard
+                icon="time-outline"
+                title="Operating Hours"
+                content={formatOpeningHours(business.opening_hours)}
+              />
+            )}
             <InfoCard
               icon="location-outline"
-              title="Locations"
-              content={`${business.branches?.length || 0} convenient locations across the city`}
+              title="Location"
+              content={business.selectedBranch?.address || 'No address available'}
             />
           </View>
         );
@@ -459,6 +470,32 @@ const BusinessScreen = () => {
         return null;
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <SafeAreaView
+        style={[styles.container, styles.loadingContainer, { backgroundColor: colors.background }]}
+        edges={['top']}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <SafeAreaView
+        style={[styles.container, styles.errorContainer, { backgroundColor: colors.background }]}
+        edges={['top']}
+      >
+        <Text style={[styles.errorText, { color: colors.error || '#ff4444' }]}>
+          {error}
+        </Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -470,14 +507,25 @@ const BusinessScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.text}
+            colors={[colors.primary]}
+            progressBackgroundColor={scheme === 'dark' ? '#334155' : '#FFFFFF'}
+          />
+        }
       >
-        <BusinessHero images={business.images} />
-        
+        <BusinessHero key={selectedBranchId} images={business.images} />
+
         <BusinessInfo
           name={business.name}
           category={business.category}
           rating={business.rating}
           branches={business.branches}
+          selectedBranchId={selectedBranchId}
+          onBranchSelect={handleBranchSelect}
         />
 
         <CustomTabs
@@ -487,7 +535,7 @@ const BusinessScreen = () => {
         />
 
         {renderContent()}
-        
+
         {/* Relative Continue Button at bottom of content */}
         {selectedServices.length > 0 && (
           <View style={styles.bottomButtonContainer}>
@@ -571,6 +619,24 @@ const styles = StyleSheet.create({
   },
   ratingCount: {
     fontSize: 14,
+  },
+  emptyText: {
+    textAlign: 'center',
+    paddingVertical: SPACING.lg,
+    fontSize: 14,
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.lg,
+  },
+  errorText: {
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

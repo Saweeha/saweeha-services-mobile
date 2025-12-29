@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Dimensions, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,10 +15,16 @@ import { TYPOGRAPHY } from '../constants/typography';
 
 const BusinessListScreen = () => {
     const navigation = useNavigation();
-    const { colors } = useTheme();
+    const { colors, scheme } = useTheme();
     const [businesses, setBusinesses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        fetchBusinesses();
+    }, []);
 
     useEffect(() => {
         fetchBusinesses();
@@ -39,12 +45,16 @@ const BusinessListScreen = () => {
             setError('Failed to load businesses. Please try again.');
         } finally {
             setIsLoading(false);
+            setRefreshing(false);
         }
     };
 
     const renderBusiness = ({ item }) => {
         const firstBranch = item?.branches?.[0];
-        const imageUrl = firstBranch?.first_image_url;
+        const firstImageObj = firstBranch?.images?.[0];
+
+        // Prioritize API image object, fallback to mock image (item.image)
+        const displayImage = firstImageObj || item.image;
 
         return (
             <View style={styles.cardWrapper}>
@@ -53,7 +63,7 @@ const BusinessListScreen = () => {
                     category={item?.category || 'General'}
                     rating={item?.average_rating || 0}
                     distance={firstBranch?.address ? firstBranch.address.split(',')[0] : 'Distance N/A'}
-                    image={imageUrl ? { uri: imageUrl } : null}
+                    image={displayImage}
                     onPress={() => navigation.navigate('Business', { business: item })}
                     cardWidth={Dimensions.get('window').width - SPACING.md * 2}
                 />
@@ -63,7 +73,7 @@ const BusinessListScreen = () => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['bottom', 'left', 'right']}>
-            {isLoading ? (
+            {isLoading && !refreshing ? (
                 <View style={styles.centerContainer}>
                     <ActivityIndicator size="large" color={colors.primary} />
                 </View>
@@ -81,6 +91,15 @@ const BusinessListScreen = () => {
                     keyExtractor={(item) => item?.id?.toString() || Math.random().toString()}
                     contentContainerStyle={styles.listContent}
                     showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                            tintColor={colors.text}
+                            colors={[colors.primary]}
+                            progressBackgroundColor={scheme === 'dark' ? '#334155' : '#FFFFFF'}
+                        />
+                    }
                     ListEmptyComponent={
                         <View style={styles.centerContainer}>
                             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No businesses found</Text>

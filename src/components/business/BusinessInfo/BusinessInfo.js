@@ -7,15 +7,21 @@ import { useTheme } from '../../../hooks/useTheme';
 import { SPACING } from '../../../constants/spacing';
 import { SIZES } from '../../../constants/sizes';
 
-const BusinessInfo = React.memo(({ name, category, rating, branches = [] }) => {
+const BusinessInfo = React.memo(({ name, category, rating, branches = [], selectedBranchId, onBranchSelect }) => {
   const { colors, scheme } = useTheme();
   const isDark = scheme === 'dark';
   const [branchModalVisible, setBranchModalVisible] = useState(false);
 
+  // Find the selected branch object
+  const selectedBranch = React.useMemo(() => {
+    if (!selectedBranchId) return branches[0];
+    return branches.find(b => b.id === selectedBranchId) || branches[0];
+  }, [branches, selectedBranchId]);
+
   const renderStars = (ratingValue) => {
     const stars = [];
-    const fullStars = Math.floor(ratingValue);
-    const hasHalfStar = ratingValue % 1 !== 0;
+    const fullStars = Math.floor(ratingValue || 0);
+    const hasHalfStar = (ratingValue || 0) % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(
@@ -29,7 +35,7 @@ const BusinessInfo = React.memo(({ name, category, rating, branches = [] }) => {
       );
     }
 
-    const emptyStars = 5 - Math.ceil(ratingValue);
+    const emptyStars = 5 - Math.ceil(ratingValue || 0);
     for (let i = 0; i < emptyStars; i++) {
       stars.push(
         <Ionicons
@@ -42,6 +48,13 @@ const BusinessInfo = React.memo(({ name, category, rating, branches = [] }) => {
     }
 
     return stars;
+  };
+
+  const handleBranchSelect = (branch) => {
+    setBranchModalVisible(false);
+    if (onBranchSelect) {
+      onBranchSelect(branch);
+    }
   };
 
   return (
@@ -59,9 +72,9 @@ const BusinessInfo = React.memo(({ name, category, rating, branches = [] }) => {
         </View>
 
         <View style={styles.ratingSection}>
-          <View style={styles.starsContainer}>{renderStars(rating || 0)}</View>
+          <View style={styles.starsContainer}>{renderStars(rating)}</View>
           <Text style={[styles.ratingText, { color: colors.text }]}>
-            {rating?.toFixed(1) || '0.0'}
+            {rating ? rating.toFixed(1) : 'Not rated'}
           </Text>
         </View>
       </View>
@@ -87,7 +100,7 @@ const BusinessInfo = React.memo(({ name, category, rating, branches = [] }) => {
               style={[styles.branchName, { color: colors.text }]}
               numberOfLines={1}
             >
-              {branches[0]?.name || 'Select Branch'}
+              {selectedBranch?.name || 'Select Branch'}
             </Text>
           </View>
           {branches.length > 1 && (
@@ -139,30 +152,54 @@ const BusinessInfo = React.memo(({ name, category, rating, branches = [] }) => {
                   style={styles.branchList}
                   showsVerticalScrollIndicator={false}
                 >
-                  {branches.map((branch, index) => (
-                    <TouchableOpacity
-                      key={branch.id || index}
-                      style={[
-                        styles.branchItem,
-                        { borderBottomColor: colors.border },
-                      ]}
-                      onPress={() => setBranchModalVisible(false)}
-                    >
-                      <Ionicons name="location" size={20} color={colors.primary} />
-                      <View style={styles.branchItemInfo}>
-                        <Text style={[styles.branchItemName, { color: colors.text }]}>
-                          {branch.name}
-                        </Text>
-                        {branch.address && (
-                          <Text
-                            style={[styles.branchItemAddress, { color: colors.textSecondary }]}
-                          >
-                            {branch.address}
-                          </Text>
+                  {branches.map((branch, index) => {
+                    const isSelected = branch.id === selectedBranchId;
+                    return (
+                      <TouchableOpacity
+                        key={branch.id || index}
+                        style={[
+                          styles.branchItem,
+                          {
+                            borderBottomColor: colors.border,
+                            backgroundColor: isSelected ? colors.backgroundSecondary : 'transparent'
+                          },
+                        ]}
+                        onPress={() => handleBranchSelect(branch)}
+                      >
+                        <Ionicons
+                          name={isSelected ? "location" : "location-outline"}
+                          size={20}
+                          color={isSelected ? colors.primary : colors.textSecondary}
+                        />
+                        <View style={styles.branchItemInfo}>
+                          <View style={styles.branchItemHeader}>
+                            <Text style={[
+                              styles.branchItemName,
+                              { color: isSelected ? colors.primary : colors.text, fontWeight: isSelected ? '700' : '600' }
+                            ]}>
+                              {branch.name}
+                            </Text>
+                            <View style={styles.branchItemRating}>
+                              <Ionicons name="star" size={12} color={branch.average_rating ? colors.warning : colors.textLight} />
+                              <Text style={[styles.branchRatingText, { color: branch.average_rating ? colors.text : colors.textLight }]}>
+                                {branch.average_rating ? branch.average_rating.toFixed(1) : 'Not rated'}
+                              </Text>
+                            </View>
+                          </View>
+                          {branch.address && (
+                            <Text
+                              style={[styles.branchItemAddress, { color: colors.textSecondary }]}
+                            >
+                              {branch.address}
+                            </Text>
+                          )}
+                        </View>
+                        {isSelected && (
+                          <Ionicons name="checkmark" size={20} color={colors.primary} />
                         )}
-                      </View>
-                    </TouchableOpacity>
-                  ))}
+                      </TouchableOpacity>
+                    );
+                  })}
                 </ScrollView>
               </BlurView>
             </TouchableOpacity>
@@ -285,9 +322,25 @@ const styles = StyleSheet.create({
   branchItemName: {
     fontSize: 16,
     fontWeight: '600',
+    flex: 1,
   },
   branchItemAddress: {
     fontSize: 14,
+  },
+  branchItemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  branchItemRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  branchRatingText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
 

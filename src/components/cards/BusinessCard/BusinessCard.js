@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Animated, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import createStyles from './BusinessCard.styles';
@@ -11,16 +11,66 @@ const BusinessCard = React.memo(({ name, category, rating, distance, image, onPr
   const styles = createStyles(colors, cardWidth);
   const isDark = scheme === 'dark';
 
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const imageOpacity = React.useRef(new Animated.Value(0)).current;
+
+  const onImageLoad = () => {
+    setImageLoaded(true);
+    Animated.timing(imageOpacity, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const renderImage = () => {
+    // Case 1: Static image (require)
+    if (typeof image === 'number') {
+      return <Image source={image} style={styles.image} />;
+    }
+
+    // Case 2: Image object from API
+    if (image && typeof image === 'object' && (image.original_url || image.uri)) {
+      const originalSource = image.original_url ? { uri: image.original_url } : image;
+      const thumbnailSource = image.thumbnail_url ? { uri: image.thumbnail_url } : null;
+
+      return (
+        <View style={styles.imageContainer}>
+          {/* Thumbnail (Background) */}
+          {thumbnailSource && !imageLoaded && (
+            <Image
+              source={thumbnailSource}
+              style={[styles.image, StyleSheet.absoluteFillObject]}
+              blurRadius={1}
+            />
+          )}
+
+          {/* Original Image (Foreground) */}
+          <Animated.Image
+            source={originalSource}
+            style={[styles.image, { opacity: imageOpacity }]}
+            onLoad={onImageLoad}
+          />
+        </View>
+      );
+    }
+
+    // Case 3: Fallback
+    return (
+      <Image
+        source={require('../../../../assets/adaptive-icon.png')}
+        style={styles.image}
+      />
+    );
+  };
+
   return (
     <TouchableOpacity
       style={styles.container}
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <Image
-        source={image || require('../../../../assets/adaptive-icon.png')}
-        style={styles.image}
-      />
+      {renderImage()}
 
       <BlurView
         intensity={80}
@@ -51,7 +101,14 @@ BusinessCard.propTypes = {
   category: PropTypes.string.isRequired,
   rating: PropTypes.number.isRequired,
   distance: PropTypes.string.isRequired,
-  image: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+  image: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.shape({
+      original_url: PropTypes.string,
+      thumbnail_url: PropTypes.string,
+      uri: PropTypes.string
+    })
+  ]),
   onPress: PropTypes.func,
   cardWidth: PropTypes.number,
 };

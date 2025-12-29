@@ -226,7 +226,9 @@ Register a new user account. To create a business, use the `/api/business` endpo
       "email": "john@example.com",
       "phone": "+1234567890",
       "user_type": "user",
-      "is_verified": false
+      "is_verified": false,
+      "profile_picture_url": null,
+      "profile_picture_thumbnail_url": null
     },
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -484,7 +486,9 @@ Authorization: Bearer <token>
           "role": "business_admin",
           "is_active": true
         }
-      ]
+      ],
+      "profile_picture_url": "https://bucket.s3.region.amazonaws.com/users/1/original.jpg",
+      "profile_picture_thumbnail_url": "https://bucket.s3.region.amazonaws.com/users/1/thumbnail.jpg"
     }
   }
 }
@@ -580,7 +584,9 @@ Authorization: Bearer <token>
           "role": "branch_employee",
           "is_active": true
         }
-      ]
+      ],
+      "profile_picture_url": null,
+      "profile_picture_thumbnail_url": null
     }
   }
 }
@@ -616,7 +622,9 @@ Authorization: Bearer <token>
         "email": "john@example.com",
         "phone": "+1234567890",
         "role": "business_admin",
-        "is_active": true
+        "is_active": true,
+        "profile_picture_url": "https://bucket.s3.region.amazonaws.com/users/1/original.jpg",
+        "profile_picture_thumbnail_url": "https://bucket.s3.region.amazonaws.com/users/1/thumbnail.jpg"
       }
     ],
     "pagination": {
@@ -837,7 +845,7 @@ Authorization: Bearer <token>
 
 **Access:** Public
 
-**Description:** Gets all active businesses with their branches and average ratings. This is a public endpoint intended for customer-facing applications. Each branch includes only its name, address, and first image.
+**Description:** Gets all active businesses with their branches and average ratings. This is a public endpoint intended for customer-facing applications. Each branch includes its details and an array of all uploaded images.
 
 **Response (200):**
 ```json
@@ -853,11 +861,147 @@ Authorization: Bearer <token>
         {
           "name": "Downtown Branch",
           "address": "123 Main St",
-          "first_image_url": "https://bucket.s3.region.amazonaws.com/branches/1/thumbnail.jpg"
+          "images": [
+            {
+              "original_url": "https://bucket.s3.region.amazonaws.com/branches/1/original.jpg",
+              "thumbnail_url": "https://bucket.s3.region.amazonaws.com/branches/1/thumbnail.jpg"
+            }
+          ]
         }
       ]
     }
   ]
+}
+```
+
+---
+
+### Get Business Details
+
+**GET** `/api/business/:id`
+
+**Access:** Public
+
+**Description:** Gets detailed information for a specific business. The response includes all active public branches. Each branch includes full details: services grouped by category, assigned professionals, and reviews.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Business details fetched successfully",
+  "data": {
+    "id": 1,
+    "name": "Lumière Salon",
+    "about": "A premium salon experience offering the latest in hair and beauty treatments.",
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00.000Z",
+    "updated_at": "2024-01-01T00:00:00.000Z",
+    "opening_hours": {
+      "monday": { "is_closed": false, "ranges": [{ "start": "09:00", "end": "18:00" }] },
+      "tuesday": { "is_closed": false, "ranges": [{ "start": "09:00", "end": "18:00" }] },
+      "wednesday": { "is_closed": false, "ranges": [{ "start": "09:00", "end": "18:00" }] },
+      "thursday": { "is_closed": false, "ranges": [{ "start": "09:00", "end": "18:00" }] },
+      "friday": { "is_closed": false, "ranges": [{ "start": "09:00", "end": "20:00" }] },
+      "saturday": { "is_closed": false, "ranges": [{ "start": "10:00", "end": "16:00" }] },
+      "sunday": { "is_closed": true }
+    },
+    "branches": [
+      {
+        "id": 1,
+        "name": "Downtown Branch",
+        "address": "123 Main St",
+        "location_url": "https://maps.google.com/...",
+        "average_rating": 4.5,
+        "images": [
+          {
+            "original_url": "https://bucket.s3.region.amazonaws.com/branches/1/original.jpg",
+            "thumbnail_url": "https://bucket.s3.region.amazonaws.com/branches/1/thumbnail.jpg"
+          }
+        ],
+        "categories": [
+          {
+            "id": 2,
+            "business_id": 1,
+            "name": "Hair Services",
+            "is_active": true,
+            "services": [
+              {
+                "id": 10,
+                "business_id": 1,
+                "category_id": 2,
+                "name": "Haircut",
+                "description": "Standard haircut",
+                "price": 50,
+                "duration_minutes": 30
+              }
+            ]
+          }
+        ],
+        "professionals": [
+          {
+            "id": 5,
+            "name": "John Doe",
+            "profile_picture_url": "https://bucket.s3.region.amazonaws.com/users/5/original.jpg",
+            "profile_picture_thumbnail_url": "https://bucket.s3.region.amazonaws.com/users/5/thumbnail.jpg",
+            "role": "branch_employee"
+          }
+        ],
+        "reviews": [
+          {
+            "id": 1,
+            "user_id": 53,
+            "user_name": "Jane User",
+            "profile_picture_url": "https://bucket.s3.region.amazonaws.com/users/53/original.jpg",
+            "profile_picture_thumbnail_url": "https://bucket.s3.region.amazonaws.com/users/53/thumbnail.jpg",
+            "rating": 5,
+            "review": "Great service!"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Uptown Branch",
+        "address": "456 High St",
+        "location_url": "https://maps.google.com/...",
+        "average_rating": null,
+        "images": [
+          {
+            "original_url": "https://bucket.s3.region.amazonaws.com/branches/2/original.jpg",
+            "thumbnail_url": "https://bucket.s3.region.amazonaws.com/branches/2/thumbnail.jpg"
+          }
+        ],
+        "categories": [
+          {
+            "id": 2,
+            "business_id": 1,
+            "name": "Hair Services",
+            "is_active": true,
+            "services": [
+              {
+                "id": 11,
+                "business_id": 1,
+                "category_id": 2,
+                "name": "Hair Styling",
+                "description": "Professional styling",
+                "price": 40,
+                "duration_minutes": 45
+              }
+            ]
+          }
+        ],
+        "professionals": [
+          {
+            "id": 6,
+            "name": "Jane Smith",
+            "profile_picture_url": "https://bucket.s3.region.amazonaws.com/users/6/original.jpg",
+            "profile_picture_thumbnail_url": "https://bucket.s3.region.amazonaws.com/users/6/thumbnail.jpg",
+            "role": "branch_admin"
+          }
+        ],
+        "reviews": []
+      }
+    ]
+  }
 }
 ```
 
@@ -878,7 +1022,8 @@ Authorization: Bearer <token>
 **Request Body:**
 ```json
 {
-  "name": "My New Business"
+  "name": "My New Business",
+  "about": "Optional business description"
 }
 ```
 
@@ -949,7 +1094,8 @@ Content-Type: multipart/form-data  // Required when uploading logo, otherwise ap
 **Request Body (JSON for text-only updates):**
 ```json
 {
-  "name": "Updated Business Name"
+  "name": "Updated Business Name",
+  "about": "Updated description"
 }
 ```
 
@@ -1037,6 +1183,118 @@ Authorization: Bearer <token>
   "data": {
     "business": { ... }
   }
+}
+```
+
+---
+
+## Promotion Endpoints
+
+### List All Promotions
+
+**GET** `/api/promotions`
+
+**Access:** Public
+
+**Description:** Gets all active promotions. Each promotion includes a business ID, an original image URL, and a thumbnail image URL.
+
+**Query Parameters:**
+- `activeOnly` (boolean, default: true) - If false, includes inactive promotions.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Promotions fetched successfully",
+  "data": [
+    {
+      "id": 1,
+      "business_id": 10,
+      "original_url": "https://bucket.s3.region.amazonaws.com/promotions/10/1703712345678/original.jpg",
+      "thumbnail_url": "https://bucket.s3.region.amazonaws.com/promotions/10/1703712345678/thumbnail.jpg",
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00.000Z",
+      "updated_at": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+### Create Promotion
+
+**POST** `/api/promotions`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+```
+
+**Access:** Super Admin
+
+**Description:** Creates a new promotion for a specific business. Requires a super_admin token.
+
+**Request Body (multipart/form-data):**
+- `business_id` (number, required) - ID of the business the promotion belongs to.
+- `is_active` (boolean, optional, default: true) - Whether the promotion is active.
+- `image` (file, required) - Promotion image (JPEG/PNG/WebP, max 5MB).
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Promotion created successfully",
+  "data": {
+    "id": 1,
+    "business_id": 10,
+    "original_url": "https://...",
+    "thumbnail_url": "https://...",
+    "is_active": true,
+    "created_at": "...",
+    "updated_at": "..."
+  }
+}
+```
+
+---
+
+### Get Promotion by ID
+
+**GET** `/api/promotions/:id`
+
+**Access:** Public
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Promotion fetched successfully",
+  "data": { ... }
+}
+```
+
+---
+
+### Delete Promotion
+
+**DELETE** `/api/promotions/:id`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Access:** Super Admin
+
+**Description:** Deletes a promotion and its associated images from S3.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Promotion deleted successfully"
 }
 ```
 
@@ -1418,6 +1676,8 @@ Authorization: Bearer <token>  // Optional, required for private branches
           "id": 1,
           "user_id": 53,
           "user_name": "John Doe",
+          "profile_picture_url": "https://bucket.s3.region.amazonaws.com/users/53/original.jpg",
+          "profile_picture_thumbnail_url": "https://bucket.s3.region.amazonaws.com/users/53/thumbnail.jpg",
           "branch_id": 11,
           "rating": 5,
           "review": "Excellent service!",
@@ -2737,6 +2997,9 @@ Authorization: Bearer <token>
         "booking_id": 1,
         "service_id": 1,
         "professional_user_business_id": 5,
+        "professional_name": "John Professional",
+        "profile_picture_url": "https://bucket.s3.region.amazonaws.com/users/5/original.jpg",
+        "profile_picture_thumbnail_url": "https://bucket.s3.region.amazonaws.com/users/5/thumbnail.jpg",
         "sequence_order": 1,
         "start_time": "2024-12-20 09:00:00",
         "end_time": "2024-12-20 09:30:00",
@@ -2750,6 +3013,9 @@ Authorization: Bearer <token>
         "booking_id": 1,
         "service_id": 2,
         "professional_user_business_id": 6,
+        "professional_name": "Jane Professional",
+        "profile_picture_url": "https://bucket.s3.region.amazonaws.com/users/6/original.jpg",
+        "profile_picture_thumbnail_url": "https://bucket.s3.region.amazonaws.com/users/6/thumbnail.jpg",
         "sequence_order": 2,
         "start_time": "2024-12-20 09:30:00",
         "end_time": "2024-12-20 10:15:00",
@@ -3008,6 +3274,8 @@ Authorization: Bearer <token>
       "id": 1,
       "user_id": 53,
       "user_name": "John Doe",
+      "profile_picture_url": "https://bucket.s3.region.amazonaws.com/users/53/original.jpg",
+      "profile_picture_thumbnail_url": "https://bucket.s3.region.amazonaws.com/users/53/thumbnail.jpg",
       "branch_id": 11,
       "rating": 5,
       "review": "Great service!",

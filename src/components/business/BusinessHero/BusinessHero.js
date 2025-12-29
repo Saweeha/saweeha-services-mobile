@@ -10,6 +10,57 @@ import { SPACING } from '../../../constants/spacing';
 const { width, height } = Dimensions.get('window');
 const HERO_HEIGHT = width * 0.7;
 
+// Module-level cache to track loaded image URLs (persists across re-renders)
+const loadedImagesCache = new Set();
+
+// Clean ProgressiveImage component - shows thumbnail until original loads
+const ProgressiveImage = React.memo(({ source, thumbnail, style, resizeMode = 'cover' }) => {
+  const imageUri = source?.uri;
+  const [isLoaded, setIsLoaded] = useState(imageUri ? loadedImagesCache.has(imageUri) : true);
+  const fadeAnim = useRef(new Animated.Value(isLoaded ? 1 : 0)).current;
+
+  const handleLoad = () => {
+    if (imageUri && !loadedImagesCache.has(imageUri)) {
+      loadedImagesCache.add(imageUri);
+      setIsLoaded(true);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
+  // No thumbnail or local image - just render normally
+  if (!thumbnail || !imageUri) {
+    return <Image source={source} style={style} resizeMode={resizeMode} />;
+  }
+
+  const thumbnailOpacity = fadeAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0],
+  });
+
+  return (
+    <View style={style}>
+      {/* Thumbnail - fades out as original fades in */}
+      <Animated.Image
+        source={{ uri: thumbnail }}
+        style={[StyleSheet.absoluteFill, style, { opacity: thumbnailOpacity }]}
+        resizeMode={resizeMode}
+        blurRadius={2}
+      />
+      {/* Original - fades in over thumbnail */}
+      <Animated.Image
+        source={source}
+        style={[StyleSheet.absoluteFill, style, { opacity: fadeAnim }]}
+        resizeMode={resizeMode}
+        onLoad={handleLoad}
+      />
+    </View>
+  );
+});
+
 const BusinessHero = React.memo(({ images = [] }) => {
   const { colors, scheme } = useTheme();
   const isDark = scheme === 'dark';
@@ -17,7 +68,7 @@ const BusinessHero = React.memo(({ images = [] }) => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
+  const [isAutoplayPaused, setIsAutoplayPaused] = useState(true);
   const [expandedIndex, setExpandedIndex] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
   const autoplayIntervalRef = useRef(null);
@@ -26,6 +77,18 @@ const BusinessHero = React.memo(({ images = [] }) => {
   if (!images || images.length === 0) {
     return null;
   }
+
+  // Helper function to get image source from the new format
+  const getImageSource = (image) => {
+    if (!image) return null;
+    // If it has a uri property (API image)
+    if (image.uri) return { uri: image.uri };
+    // If it has a source property (local image)
+    if (image.source) return image.source;
+    // If it's a number (require() result) or has uri directly
+    if (typeof image === 'number') return image;
+    return image;
+  };
 
   // Auto-play: advance slide every 4 seconds
   useEffect(() => {
@@ -99,6 +162,7 @@ const BusinessHero = React.memo(({ images = [] }) => {
           showsHorizontalScrollIndicator={false}
           onScroll={handleScroll}
           scrollEventThrottle={16}
+          removeClippedSubviews={false}
         >
           {images.map((image, index) => (
             <TouchableOpacity
@@ -107,8 +171,9 @@ const BusinessHero = React.memo(({ images = [] }) => {
               activeOpacity={0.9}
               onPress={handleImagePress}
             >
-              <Image
-                source={image}
+              <ProgressiveImage
+                source={getImageSource(image)}
+                thumbnail={image?.thumbnail}
                 style={styles.image}
                 resizeMode="cover"
               />
@@ -133,10 +198,10 @@ const BusinessHero = React.memo(({ images = [] }) => {
               tint={isDark ? 'dark' : 'light'}
               style={styles.favoriteButtonBlur}
             >
-              <Ionicons 
-                name={isFavorited ? "heart" : "heart-outline"} 
-                size={24} 
-                color="#EF4444" 
+              <Ionicons
+                name={isFavorited ? "heart" : "heart-outline"}
+                size={24}
+                color="#EF4444"
               />
             </BlurView>
           </TouchableOpacity>
@@ -161,8 +226,8 @@ const BusinessHero = React.memo(({ images = [] }) => {
                           index === currentIndex
                             ? colors.primaryLight
                             : isDark
-                            ? colors.textLight
-                            : colors.textWhite,
+                              ? colors.textLight
+                              : colors.textWhite,
                         opacity: index === currentIndex ? 1 : isDark ? 0.7 : 0.5,
                       },
                     ]}
@@ -207,6 +272,7 @@ const BusinessHero = React.memo(({ images = [] }) => {
             scrollEventThrottle={16}
             style={styles.expandedScrollView}
             contentContainerStyle={styles.expandedScrollContent}
+            removeClippedSubviews={false}
           >
             {images.map((image, index) => (
               <ScrollView
@@ -219,8 +285,9 @@ const BusinessHero = React.memo(({ images = [] }) => {
                 showsHorizontalScrollIndicator={false}
                 bouncesZoom={true}
               >
-                <Image
-                  source={image}
+                <ProgressiveImage
+                  source={getImageSource(image)}
+                  thumbnail={image?.thumbnail}
                   style={styles.expandedImage}
                   resizeMode="contain"
                 />
@@ -247,8 +314,8 @@ const BusinessHero = React.memo(({ images = [] }) => {
                             index === expandedIndex
                               ? colors.primaryLight
                               : isDark
-                              ? colors.textLight
-                              : colors.textWhite,
+                                ? colors.textLight
+                                : colors.textWhite,
                           opacity: index === expandedIndex ? 1 : isDark ? 0.7 : 0.5,
                         },
                       ]}
