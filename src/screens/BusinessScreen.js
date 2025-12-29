@@ -25,6 +25,7 @@ import FloatingContinueButton from '../components/ui/FloatingContinueButton/Floa
 // Constants & Hooks
 import { SPACING } from '../constants/spacing';
 import { useTheme } from '../hooks/useTheme';
+import { formatRelativeDate } from '../utils/date';
 
 const BusinessScreen = () => {
   const route = useRoute();
@@ -239,23 +240,6 @@ const BusinessScreen = () => {
     }));
   }, [business.reviews]);
 
-  // Helper function to format relative dates
-  const formatRelativeDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffMs = now - date;
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-      if (diffDays === 0) return 'Today';
-      if (diffDays === 1) return 'Yesterday';
-      if (diffDays < 7) return `${diffDays} days ago`;
-      if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
-      return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''} ago`;
-    } catch {
-      return '';
-    }
-  };
 
   // Helper function to format opening hours
   const formatOpeningHours = (hours) => {

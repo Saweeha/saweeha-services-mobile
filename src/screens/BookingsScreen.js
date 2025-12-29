@@ -58,7 +58,7 @@ const BookingsScreen = () => {
     {
       id: '3',
       business: {
-        name: 'FitZone Gym',
+        name: 'ABC Salon',
         category: 'Fitness',
         image: require('../../assets/businesses/pexels-thgusstavo-1813272.jpg'),
       },

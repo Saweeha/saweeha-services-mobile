@@ -33,7 +33,7 @@ const FavoritesScreen = () => {
     },
     {
       id: '2',
-      name: 'FitZone Gym',
+      name: 'ABC Salon',
       category: 'Fitness',
       rating: 4.6,
       distance: '1.2 km',

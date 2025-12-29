@@ -43,7 +43,7 @@ const NotificationsScreen = () => {
       id: '3',
       type: 'reminder',
       title: 'Reminder',
-      message: "Don't forget your booking at FitZone Gym tomorrow",
+      message: "Don't forget your booking at ABC Salon tomorrow",
       time: '3 hours ago',
       isRead: true,
     },
