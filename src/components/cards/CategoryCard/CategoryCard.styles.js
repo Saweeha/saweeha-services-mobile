@@ -5,7 +5,7 @@ import { SIZES } from '../../../constants/sizes';
 import { TYPOGRAPHY } from '../../../constants/typography';
 
 const { width } = Dimensions.get('window');
-const cardWidth = (width - SPACING.md * 3) / 2; // 2 columns with spacing
+const cardWidth = (width - SPACING.md * 3) / 2;
 
 export default StyleSheet.create({
   container: {

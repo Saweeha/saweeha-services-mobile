@@ -21,7 +21,6 @@ import RegisterModal from './src/components/modals/AuthModal/RegisterModal';
 import ForgotPasswordModal from './src/components/modals/AuthModal/ForgotPasswordModal';
 import OtpModal from './src/components/modals/AuthModal/OtpModal';
 
-// Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 const AppContent = () => {
@@ -29,25 +28,19 @@ const AppContent = () => {
   const dispatch = useDispatch();
   const { hasShownLaunchModal } = useSelector((state) => state.auth);
 
-  // Check auth status on app launch
   useEffect(() => {
     dispatch(checkAuthStatus());
   }, [dispatch]);
 
-  // Show auth modal on app launch if not authenticated (only once)
   useEffect(() => {
     if (!hasShownLaunchModal) {
-      // We check if isAuthenticated is false, but we should also wait for loading
-      // However, the current slice logic sets isAuthenticated to false by default.
-      // To avoid flashing the modal if the user IS logged in, we can wait a bit or
-      // check if we have a token first.
       const timer = setTimeout(async () => {
         const token = await AsyncStorage.getItem('token');
         if (!token) {
           dispatch(showAuthModal({ routeName: null, type: 'login' }));
         }
         dispatch(setHasShownLaunchModal());
-      }, 500); // Small delay to allow checkAuthStatus to potentially finish or at least check AsyncStorage
+      }, 500);
 
       return () => clearTimeout(timer);
     }

@@ -63,7 +63,6 @@ const RegisterModal = () => {
         setErrors((prev) => ({ ...prev, password: null }));
       }
     }
-    // Also validate confirm password if it's been touched
     if (touched.confirmPassword && confirmPassword) {
       const matchValidation = validatePasswordMatch(text, confirmPassword);
       if (!matchValidation.isValid) {
@@ -85,7 +84,6 @@ const RegisterModal = () => {
   };
 
   const handlePhoneChange = (text) => {
-    // Ensure phone starts with +
     let formattedPhone = text;
     if (!formattedPhone.startsWith('+')) {
       formattedPhone = '+' + formattedPhone.replace(/^\+*/, '');
@@ -115,7 +113,6 @@ const RegisterModal = () => {
       return;
     }
 
-    // Clear errors and proceed with registration
     setErrors({});
 
     dispatch(registerUser({
@@ -124,16 +121,10 @@ const RegisterModal = () => {
       phone: phone.trim(),
       password
     }));
-    // Note: otp modal is opened by the slice upon success
   };
 
   const handleSocialRegister = () => {
-    // Social auth bypasses form validation
-    // In a real app, this would trigger Google/Facebook auth flow
-    // For social auth, we log the user in directly (no OTP needed since provider handles verification)
-    // dispatch(login());
     alert('Social login not implemented yet');
-    // handleClose();
   };
 
   const switchToLogin = () => {
@@ -167,7 +158,6 @@ const RegisterModal = () => {
           style={styles.keyboardView}
         >
           <View style={[styles.modalContent, { backgroundColor: colors.backgroundLight }]}>
-            {/* Header */}
             <View style={styles.header}>
               <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
@@ -182,14 +172,12 @@ const RegisterModal = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Form */}
             <ScrollView
               style={styles.formContainer}
               contentContainerStyle={styles.formContentContainer}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
-              {/* API Error Display */}
               {error && (
                 <Text style={{ color: colors.error, marginBottom: 10, textAlign: 'center' }}>
                   {error}

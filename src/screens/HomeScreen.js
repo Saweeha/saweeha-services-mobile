@@ -3,14 +3,12 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, FlatList, Refresh
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
-// Components
 import PromotionSwiper from '../components/media/PromotionSwiper/PromotionSwiper';
 import CategoryCard from '../components/cards/CategoryCard/CategoryCard';
 import BusinessCard from '../components/cards/BusinessCard/BusinessCard';
 import HomeHeader from '../components/layout/HomeHeader/HomeHeader';
 import { businessService } from '../services/businessService';
 
-// Constants
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';
@@ -48,7 +46,6 @@ const HomeScreen = () => {
     }
   }, []);
 
-  // Pull-to-refresh state and handler
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(() => {
@@ -56,7 +53,6 @@ const HomeScreen = () => {
     fetchNearYouBusinesses();
   }, [fetchNearYouBusinesses]);
 
-  // Mock data - replace with API calls later
   const promotions = [
     {
       id: '1',
@@ -121,14 +117,13 @@ const HomeScreen = () => {
   ];
 
   const renderBusiness = ({ item }) => {
-    // Basic null safety for the mapping
     const firstBranch = item?.branches?.[0];
     const imageObj = firstBranch?.images?.[0];
 
     return (
       <BusinessCard
         name={item?.name || 'Unknown Business'}
-        category={item?.category || 'General'} // Use category if available, otherwise fallback
+        category={item?.category || 'General'}
         rating={item?.average_rating || 0}
         distance={firstBranch?.address ? firstBranch.address.split(',')[0] : 'Distance N/A'}
         image={imageObj}
@@ -165,7 +160,6 @@ const HomeScreen = () => {
           }}
         />
 
-        {/* Promotions Section */}
         <View style={styles.section}>
           <PromotionSwiper
             promotions={promotions}
@@ -173,7 +167,6 @@ const HomeScreen = () => {
           />
         </View>
 
-        {/* Near You Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Near You</Text>
@@ -209,7 +202,6 @@ const HomeScreen = () => {
           )}
         </View>
 
-        {/* Categories Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Categories</Text>
@@ -230,7 +222,6 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        {/* Featured Businesses Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Featured Businesses</Text>

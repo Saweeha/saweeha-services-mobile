@@ -17,10 +17,8 @@ const AnimatedHeader = ({ title, onBackPress, showBackButton, rightComponent, th
   const insets = useSafeAreaInsets();
   const isDark = scheme === 'dark';
 
-  // Gracefully handle null (no scroll channel active)
   const scrollY = activeScrollChannel?.scrollY || new Animated.Value(0);
 
-  // Header animations based on scroll threshold
   const headerOpacity = scrollY.interpolate({
     inputRange: [threshold, threshold + 50],
     outputRange: [0, 1],
@@ -33,8 +31,6 @@ const AnimatedHeader = ({ title, onBackPress, showBackButton, rightComponent, th
     extrapolate: 'clamp',
   });
 
-  // Floating back button - driven by explicit scroll thresholds (not inverse opacity)
-  // Shows when scrolled past threshold (collapsed state)
   const floatingBackButtonOpacity = scrollY.interpolate({
     inputRange: [threshold, threshold + 50],
     outputRange: [1, 0],
@@ -49,7 +45,6 @@ const AnimatedHeader = ({ title, onBackPress, showBackButton, rightComponent, th
 
   return (
     <>
-      {/* Main Animated Header */}
       <Animated.View
         style={[
           styles.headerContainer,
@@ -74,7 +69,6 @@ const AnimatedHeader = ({ title, onBackPress, showBackButton, rightComponent, th
         </BlurView>
       </Animated.View>
 
-      {/* Floating Back Button (shown when header is hidden) */}
       {showBackButton && onBackPress && (
         <Animated.View
           style={[

@@ -22,7 +22,6 @@ const RootNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={({ navigation, route }) => {
-        // Intercept navigation to protected routes
         const originalNavigate = navigation.navigate;
         navigation.navigate = (screenName, params) => {
           const protectedRoutes = {
@@ -57,8 +56,6 @@ const RootNavigator = () => {
         name="Business"
         component={BusinessScreen}
         options={{
-          // Title is read dynamically from route.params in headerConfig
-          // This ensures reactive updates when route params change
           title: 'Business',
         }}
       />

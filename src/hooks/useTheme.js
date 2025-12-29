@@ -9,14 +9,13 @@ export const THEME_PREFERENCE_KEY = 'themePreference';
 const ThemeContext = createContext({
   scheme: 'light',
   colors: getColorsForScheme('light'),
-  setScheme: () => {},
-  toggleScheme: () => {},
+  setScheme: () => { },
+  toggleScheme: () => { },
 });
 
 export const ThemeProvider = ({ children }) => {
   const [scheme, setScheme] = useState('light');
 
-  // Load saved theme or fall back to system
   useEffect(() => {
     let isMounted = true;
 
@@ -40,7 +39,6 @@ export const ThemeProvider = ({ children }) => {
     loadTheme();
 
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      // Only react to system changes when no explicit preference is stored.
       AsyncStorage.getItem(THEME_PREFERENCE_KEY).then((stored) => {
         if (!stored) {
           setScheme(colorScheme === 'dark' ? 'dark' : 'light');
@@ -62,7 +60,6 @@ export const ThemeProvider = ({ children }) => {
     try {
       await AsyncStorage.setItem(THEME_PREFERENCE_KEY, normalized);
     } catch {
-      // ignore storage errors, theme will still change in-memory
     }
   };
 

@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
 
-// Components
 import AutoScrollView from '../components/list/AutoScrollView/AutoScrollView';
 import DatePicker from '../components/booking/DatePicker/DatePicker';
 import TimeSlotPicker from '../components/booking/TimeSlotPicker/TimeSlotPicker';
@@ -12,7 +11,6 @@ import ContinueButton from '../components/ui/ContinueButton/ContinueButton';
 import FloatingContinueButton from '../components/ui/FloatingContinueButton/FloatingContinueButton';
 import BookingConfirmationModal from '../components/modals/BookingConfirmationModal/BookingConfirmationModal';
 
-// Constants & Hooks
 import { SPACING } from '../constants/spacing';
 import { SIZES } from '../constants/sizes';
 import { useTheme } from '../hooks/useTheme';
@@ -36,7 +34,6 @@ const BookingDateTimeScreen = () => {
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
-    // Reset time when date changes
     setSelectedTime(null);
   };
 
@@ -47,7 +44,6 @@ const BookingDateTimeScreen = () => {
   const handleConfirm = () => {
     if (!selectedDate || !selectedTime) return;
 
-    // Set booking details and show confirmation modal
     setBookingDetails({
       business,
       branch: selectedBranch,
@@ -59,7 +55,6 @@ const BookingDateTimeScreen = () => {
   };
 
   const handleConfirmationClose = () => {
-    // Reset navigation stack and navigate to home screen
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
@@ -77,11 +72,10 @@ const BookingDateTimeScreen = () => {
     setShowConfirmation(false);
   };
 
-  // Handle scroll to detect if at bottom
   const handleScroll = useCallback((event) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    const paddingToBottom = 100; // Threshold for "at bottom"
-    const isBottom = 
+    const paddingToBottom = 100;
+    const isBottom =
       layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
     setIsAtBottom(isBottom);
   }, []);
@@ -99,7 +93,6 @@ const BookingDateTimeScreen = () => {
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
       >
-        {/* Header Section */}
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>
             Select Date & Time
@@ -109,7 +102,6 @@ const BookingDateTimeScreen = () => {
           </Text>
         </View>
 
-        {/* Selected Services Summary */}
         {selectedServices && selectedServices.length > 0 && (
           <View style={[styles.summaryCard, { backgroundColor: colors.backgroundLight }]}>
             <View style={styles.summaryHeader}>
@@ -148,13 +140,11 @@ const BookingDateTimeScreen = () => {
           </View>
         )}
 
-        {/* Date Picker */}
         <DatePicker
           selectedDate={selectedDate}
           onDateSelect={handleDateSelect}
         />
 
-        {/* Time Slot Picker */}
         {selectedDate && (
           <TimeSlotPicker
             selectedTime={selectedTime}
@@ -163,7 +153,6 @@ const BookingDateTimeScreen = () => {
           />
         )}
 
-        {/* Relative Confirmation Button at bottom of content */}
         {canConfirm && (
           <View style={styles.buttonContainer}>
             <ContinueButton
@@ -175,7 +164,6 @@ const BookingDateTimeScreen = () => {
         )}
       </AutoScrollView>
 
-      {/* Floating Confirmation Button */}
       <FloatingContinueButton
         visible={canConfirm && !isAtBottom}
         onPress={handleConfirm}
@@ -183,7 +171,6 @@ const BookingDateTimeScreen = () => {
         icon="arrow-forward"
       />
 
-      {/* Booking Confirmation Modal */}
       <BookingConfirmationModal
         visible={showConfirmation}
         bookingDetails={bookingDetails}

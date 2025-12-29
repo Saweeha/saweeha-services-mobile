@@ -3,7 +3,7 @@ import { SPACING } from '../../../constants/spacing';
 import { TYPOGRAPHY } from '../../../constants/typography';
 
 const { width } = Dimensions.get('window');
-const cardWidth = (width - SPACING.md * 3) / 2; // 2 columns with spacing
+const cardWidth = (width - SPACING.md * 3) / 2;
 
 const createTeamMemberCardStyles = (colors) => StyleSheet.create({
     container: {

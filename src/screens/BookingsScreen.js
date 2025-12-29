@@ -18,7 +18,6 @@ const BookingsScreen = () => {
   useAuthGuard('Bookings');
   const [activeTab, setActiveTab] = useState('upcoming');
 
-  // Mock data - replace with API calls later
   const [bookings] = useState([
     {
       id: '1',
@@ -31,7 +30,7 @@ const BookingsScreen = () => {
         name: 'Downtown Branch',
         address: '123 Main St',
       },
-      date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+      date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
       time: '10:00 AM',
       services: [
         { id: '1', title: 'Haircut & Styling', price: '$45' },
@@ -50,7 +49,7 @@ const BookingsScreen = () => {
         name: 'Main Branch',
         address: '456 Oak Ave',
       },
-      date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+      date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
       time: '2:30 PM',
       services: [{ id: '3', title: 'Full Body Massage', price: '$80' }],
       status: 'upcoming',
@@ -66,7 +65,7 @@ const BookingsScreen = () => {
         name: 'Central Branch',
         address: '789 Park Blvd',
       },
-      date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+      date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       time: '9:00 AM',
       services: [{ id: '4', title: 'Personal Training Session', price: '$60' }],
       status: 'completed',
@@ -82,7 +81,7 @@ const BookingsScreen = () => {
         name: 'Waterfront Branch',
         address: '321 Harbor Dr',
       },
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
       time: '11:00 AM',
       services: [
         { id: '5', title: 'Facial Treatment', price: '$75' },
@@ -101,7 +100,7 @@ const BookingsScreen = () => {
         name: 'Uptown Branch',
         address: '654 High St',
       },
-      date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+      date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
       time: '3:00 PM',
       services: [{ id: '7', title: 'Hair Color', price: '$120' }],
       status: 'cancelled',
@@ -123,13 +122,11 @@ const BookingsScreen = () => {
   }, [bookings, activeTab]);
 
   const handleCancel = (booking) => {
-    // Update booking status to cancelled
     Alert.alert(
       'Booking Cancelled',
       `Your booking at ${booking.business?.name} has been cancelled.`,
       [{ text: 'OK' }]
     );
-    // In a real app, you would call an API here
     console.log('Cancel booking:', booking.id);
   };
 
@@ -197,17 +194,14 @@ const BookingsScreen = () => {
       style={[styles.container, { backgroundColor: colors.background }]}
       edges={['top']}
     >
-      {/* Header */}
       <ScreenHeader
         title="My Bookings"
         count={filteredBookings.length > 0 ? getBookingCount() : undefined}
         countLabel="booking"
       />
 
-      {/* Filter Tabs */}
       <CustomTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* Bookings List */}
       {filteredBookings.length > 0 ? (
         <FlatList
           data={filteredBookings}

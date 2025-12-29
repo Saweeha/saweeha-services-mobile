@@ -9,11 +9,10 @@ const TimeSlotPicker = React.memo(({ selectedTime, onTimeSelect, selectedDate })
   const { colors } = useTheme();
   const styles = useMemo(() => createTimeSlotPickerStyles(colors), [colors]);
 
-  // Generate time slots from 9 AM to 9 PM in 30-minute intervals
   const timeSlots = useMemo(() => {
     const slots = [];
     const startHour = 9;
-    const endHour = 21; // 9 PM
+    const endHour = 21;
 
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {

@@ -9,7 +9,6 @@ import { SPACING } from '../constants/spacing';
 import { SIZES } from '../constants/sizes';
 import { useTheme } from '../hooks/useTheme';
 
-// Screens
 import HomeScreen from '../screens/HomeScreen';
 import BookingsScreen from '../screens/BookingsScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
@@ -55,17 +54,15 @@ const TabNavigator = () => {
         tabBarItemStyle: styles.tabBarItem,
       })}
     >
-      <Tab.Screen 
-        name="Home" 
+      <Tab.Screen
+        name="Home"
         component={HomeScreen}
         listeners={{
-          tabPress: (e) => {
-            // Allow navigation to Home
-          },
+          tabPress: (e) => { },
         }}
       />
-      <Tab.Screen 
-        name="Bookings" 
+      <Tab.Screen
+        name="Bookings"
         component={BookingsScreen}
         listeners={{
           tabPress: (e) => {
@@ -76,8 +73,8 @@ const TabNavigator = () => {
           },
         }}
       />
-      <Tab.Screen 
-        name="Favorites" 
+      <Tab.Screen
+        name="Favorites"
         component={FavoritesScreen}
         listeners={{
           tabPress: (e) => {

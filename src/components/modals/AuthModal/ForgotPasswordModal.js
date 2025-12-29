@@ -33,9 +33,7 @@ const ForgotPasswordModal = () => {
 
   const handleSubmit = () => {
     if (!email) return;
-    // Call the API to send the password reset code
     dispatch(forgotPassword(email));
-    // The authSlice will open OTP modal on success
   };
 
   const handleBackToLogin = () => {
@@ -56,7 +54,6 @@ const ForgotPasswordModal = () => {
           style={styles.keyboardView}
         >
           <View style={[styles.modalContent, { backgroundColor: colors.backgroundLight }]}>
-            {/* Header */}
             <View style={styles.header}>
               <Text style={[styles.title, { color: colors.text }]}>Reset Password</Text>
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>

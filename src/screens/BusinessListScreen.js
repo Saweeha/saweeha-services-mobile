@@ -4,10 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
-// Components
 import BusinessCard from '../components/cards/BusinessCard/BusinessCard';
 
-// Services & Constants
 import { businessService } from '../services/businessService';
 import { useTheme } from '../hooks/useTheme';
 import { SPACING } from '../constants/spacing';
@@ -53,7 +51,6 @@ const BusinessListScreen = () => {
         const firstBranch = item?.branches?.[0];
         const firstImageObj = firstBranch?.images?.[0];
 
-        // Prioritize API image object, fallback to mock image (item.image)
         const displayImage = firstImageObj || item.image;
 
         return (

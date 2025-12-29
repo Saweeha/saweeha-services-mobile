@@ -24,19 +24,16 @@ const BusinessCard = React.memo(({ name, category, rating, distance, image, onPr
   };
 
   const renderImage = () => {
-    // Case 1: Static image (require)
     if (typeof image === 'number') {
       return <Image source={image} style={styles.image} />;
     }
 
-    // Case 2: Image object from API
     if (image && typeof image === 'object' && (image.original_url || image.uri)) {
       const originalSource = image.original_url ? { uri: image.original_url } : image;
       const thumbnailSource = image.thumbnail_url ? { uri: image.thumbnail_url } : null;
 
       return (
         <View style={styles.imageContainer}>
-          {/* Thumbnail (Background) */}
           {thumbnailSource && !imageLoaded && (
             <Image
               source={thumbnailSource}
@@ -45,7 +42,6 @@ const BusinessCard = React.memo(({ name, category, rating, distance, image, onPr
             />
           )}
 
-          {/* Original Image (Foreground) */}
           <Animated.Image
             source={originalSource}
             style={[styles.image, { opacity: imageOpacity }]}
@@ -55,7 +51,6 @@ const BusinessCard = React.memo(({ name, category, rating, distance, image, onPr
       );
     }
 
-    // Case 3: Fallback
     return (
       <Image
         source={require('../../../../assets/adaptive-icon.png')}

@@ -1,68 +1,57 @@
 export const LIGHT_COLORS = {
-  // Primary colors - Indigo & Purple
-  primary: '#6366F1', // Indigo-500
-  primaryDark: '#4F46E5', // Indigo-600
-  primaryLight: '#818CF8', // Indigo-400
-  primaryLighter: '#A5B4FC', // Indigo-300
+  primary: '#6366F1',
+  primaryDark: '#4F46E5',
+  primaryLight: '#818CF8',
+  primaryLighter: '#A5B4FC',
 
-  // Secondary colors - Purple tones
-  secondary: '#8B5CF6', // Purple-500
-  secondaryDark: '#7C3AED', // Purple-600
-  secondaryLight: '#A78BFA', // Purple-400
+  secondary: '#8B5CF6',
+  secondaryDark: '#7C3AED',
+  secondaryLight: '#A78BFA',
 
-  // Accent colors - Vibrant purples
-  accent: '#A855F7', // Purple-500
-  accentDark: '#9333EA', // Purple-600
-  accentLight: '#C084FC', // Purple-400
+  accent: '#A855F7',
+  accentDark: '#9333EA',
+  accentLight: '#C084FC',
 
-  // Background colors - Soft purple/indigo tints
-  background: '#FAF5FF', // Very light purple tint
+  background: '#FAF5FF',
   backgroundLight: '#FFFFFF',
-  backgroundDark: '#1E1B4B', // Deep indigo
-  backgroundSecondary: '#F3F4F6', // Light gray with purple undertone
+  backgroundDark: '#1E1B4B',
+  backgroundSecondary: '#F3F4F6',
 
-  // Text colors
-  text: '#1F2937', // Almost black with slight cool tone
-  textSecondary: '#4B5563', // Medium gray
-  textLight: '#9CA3AF', // Light gray
+  text: '#1F2937',
+  textSecondary: '#4B5563',
+  textLight: '#9CA3AF',
   textWhite: '#FFFFFF',
 
-  // Border colors
-  border: '#E5E7EB', // Light gray
-  borderLight: '#F3F4F6', // Very light gray
-  borderDark: '#6B7280', // Medium gray
-  borderPurple: '#E9D5FF', // Light purple border
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
+  borderDark: '#6B7280',
+  borderPurple: '#E9D5FF',
 
-  // Status colors - Harmonized with purple theme
-  error: '#EF4444', // Red-500
-  errorLight: '#FEE2E2', // Red-100
-  success: '#10B981', // Emerald-500
-  successLight: '#D1FAE5', // Emerald-100
-  warning: '#F59E0B', // Amber-500
-  warningLight: '#FEF3C7', // Amber-100
-  info: '#6366F1', // Indigo-500 (matches primary)
-  infoLight: '#E0E7FF', // Indigo-100
+  error: '#EF4444',
+  errorLight: '#FEE2E2',
+  success: '#10B981',
+  successLight: '#D1FAE5',
+  warning: '#F59E0B',
+  warningLight: '#FEF3C7',
+  info: '#6366F1',
+  infoLight: '#E0E7FF',
 
-  // Glass effect colors - Purple tinted
   glassBackground: 'rgba(255, 255, 255, 0.75)',
-  glassBorder: 'rgba(139, 92, 246, 0.2)', // Purple with opacity
-  glassBackgroundDark: 'rgba(99, 102, 241, 0.15)', // Indigo with opacity
+  glassBorder: 'rgba(139, 92, 246, 0.2)',
+  glassBackgroundDark: 'rgba(99, 102, 241, 0.15)',
 
-  // Gradient colors - Beautiful purple/indigo gradients
-  gradientStart: '#6366F1', // Indigo-500
-  gradientEnd: '#8B5CF6', // Purple-500
-  gradientSecondary: '#A855F7', // Purple-500
-  gradientTertiary: '#EC4899', // Pink-500 for accent gradients
+  gradientStart: '#6366F1',
+  gradientEnd: '#8B5CF6',
+  gradientSecondary: '#A855F7',
+  gradientTertiary: '#EC4899',
 
-  // Category colors - Vibrant, complementary to purple/indigo
-  category1: '#EC4899', // Pink-500 - Beauty Salons
-  category2: '#F59E0B', // Amber-500 - Barbers
-  category3: '#10B981', // Emerald-500 - Massage/Wellness
-  category4: '#3B82F6', // Blue-500 - Nail Salons
-  category5: '#8B5CF6', // Purple-500 - Spa & Wellness
-  category6: '#EF4444', // Red-500 - Fitness Centers
+  category1: '#EC4899',
+  category2: '#F59E0B',
+  category3: '#10B981',
+  category4: '#3B82F6',
+  category5: '#8B5CF6',
+  category6: '#EF4444',
 
-  // Additional purple/indigo shades for variety
   purple50: '#FAF5FF',
   purple100: '#F3E8FF',
   purple200: '#E9D5FF',
@@ -83,41 +72,34 @@ export const LIGHT_COLORS = {
 };
 
 export const DARK_COLORS = {
-  // Primary colors - keep brand but slightly dimmed
-  primary: '#818CF8', // Indigo-400
-  primaryDark: '#6366F1', // Indigo-500
-  primaryLight: '#A5B4FC', // Indigo-300
-  primaryLighter: '#C7D2FE', // Indigo-200
+  primary: '#818CF8',
+  primaryDark: '#6366F1',
+  primaryLight: '#A5B4FC',
+  primaryLighter: '#C7D2FE',
 
-  // Secondary colors - Purple tones
-  secondary: '#A855F7', // Purple-500
-  secondaryDark: '#7E22CE', // Purple-700
-  secondaryLight: '#C084FC', // Purple-400
+  secondary: '#A855F7',
+  secondaryDark: '#7E22CE',
+  secondaryLight: '#C084FC',
 
-  // Accent colors
   accent: '#C084FC',
   accentDark: '#A855F7',
   accentLight: '#E9D5FF',
 
-  // Background colors - dark surfaces
-  background: '#020617', // slate-950
-  backgroundLight: '#020617', // main app background
+  background: '#020617',
+  backgroundLight: '#020617',
   backgroundDark: '#020617',
-  backgroundSecondary: '#111827', // slate-900
+  backgroundSecondary: '#111827',
 
-  // Text colors
-  text: '#F9FAFB', // slate-50
+  text: '#F9FAFB',
   textSecondary: '#CBD5F5',
   textLight: '#9CA3AF',
   textWhite: '#FFFFFF',
 
-  // Border colors
   border: '#1F2937',
   borderLight: '#111827',
   borderDark: '#4B5563',
   borderPurple: '#4C1D95',
 
-  // Status colors
   error: '#F87171',
   errorLight: '#7F1D1D',
   success: '#34D399',
@@ -127,18 +109,15 @@ export const DARK_COLORS = {
   info: '#818CF8',
   infoLight: '#1E293B',
 
-  // Glass effect colors - darker overlay
   glassBackground: 'rgba(15, 23, 42, 0.85)',
   glassBorder: 'rgba(129, 140, 248, 0.4)',
   glassBackgroundDark: 'rgba(15, 23, 42, 0.9)',
 
-  // Gradients
   gradientStart: '#4F46E5',
   gradientEnd: '#7C3AED',
   gradientSecondary: '#A855F7',
   gradientTertiary: '#EC4899',
 
-  // Category colors - keep vibrant for contrast
   category1: '#FB7185',
   category2: '#FACC15',
   category3: '#4ADE80',
@@ -146,7 +125,6 @@ export const DARK_COLORS = {
   category5: '#A855F7',
   category6: '#F97373',
 
-  // Additional purple/indigo shades for variety
   purple50: '#1E1B4B',
   purple100: '#312E81',
   purple200: '#3730A3',
@@ -169,7 +147,5 @@ export const DARK_COLORS = {
 export const getColorsForScheme = (scheme) =>
   scheme === 'dark' ? DARK_COLORS : LIGHT_COLORS;
 
-// Backwards-compatible default export used in non-themed code paths.
-// New code should prefer getColorsForScheme or the theme hook.
 export const COLORS = LIGHT_COLORS;
 

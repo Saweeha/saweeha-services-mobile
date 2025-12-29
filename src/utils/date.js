@@ -1,14 +1,9 @@
-/**
- * Formats a date string into YYYY-MM-DD format
- * @param {string|Date} date - The date to format
- * @returns {string} Formatted date string
- */
 export const formatDate = (date) => {
     if (!date) return '';
 
     try {
         const d = new Date(date);
-        if (isNaN(d.getTime())) return String(date); // Fallback to original if invalid
+        if (isNaN(d.getTime())) return String(date);
 
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -21,11 +16,6 @@ export const formatDate = (date) => {
     }
 };
 
-/**
- * Formats a date string into a relative format (e.g., Today, Yesterday, 2 days ago)
- * @param {string|Date} dateString - The date to format
- * @returns {string} Formatted relative date string
- */
 export const formatRelativeDate = (dateString) => {
     try {
         const date = new Date(dateString);

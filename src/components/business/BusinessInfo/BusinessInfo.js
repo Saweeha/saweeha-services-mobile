@@ -12,7 +12,6 @@ const BusinessInfo = React.memo(({ name, category, rating, branches = [], select
   const styles = useMemo(() => createBusinessInfoStyles(colors), [colors]);
   const [branchModalVisible, setBranchModalVisible] = useState(false);
 
-  // Find the selected branch object
   const selectedBranch = React.useMemo(() => {
     if (!selectedBranchId) return branches[0];
     return branches.find(b => b.id === selectedBranchId) || branches[0];
@@ -113,7 +112,6 @@ const BusinessInfo = React.memo(({ name, category, rating, branches = [], select
         </TouchableOpacity>
       )}
 
-      {/* Branch Selection Modal */}
       {branches.length > 1 && (
         <Modal
           visible={branchModalVisible}

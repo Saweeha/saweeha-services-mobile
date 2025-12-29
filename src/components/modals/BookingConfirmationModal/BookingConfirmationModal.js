@@ -95,22 +95,18 @@ const BookingConfirmationModal = ({
               tint={isDark ? 'dark' : 'light'}
               style={styles.modalContent}
             >
-              {/* Success Icon */}
               <View style={[styles.iconContainer, { backgroundColor: colors.successLight }]}>
                 <Ionicons name="checkmark-circle" size={64} color={colors.success} />
               </View>
 
-              {/* Title */}
               <Text style={[styles.title, { color: colors.text }]}>
                 Booking Confirmed!
               </Text>
 
-              {/* Subtitle */}
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
                 Your appointment has been successfully booked
               </Text>
 
-              {/* Booking Details */}
               <View style={[styles.detailsContainer, { backgroundColor: colors.backgroundSecondary }]}>
                 <View style={styles.detailRow}>
                   <Ionicons name="location" size={20} color={colors.primary} />
@@ -161,7 +157,6 @@ const BookingConfirmationModal = ({
                 </View>
               </View>
 
-              {/* Confirm Button */}
               <View style={styles.buttonContainer}>
                 <ContinueButton
                   label="Done"

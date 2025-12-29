@@ -98,7 +98,6 @@ const ProfessionalSelectionModal = ({
                       <View style={styles.avatarContainer}>
                         {professional.image ? (
                           <View style={styles.avatar}>
-                            {/* Image would go here if available */}
                           </View>
                         ) : (
                           <View

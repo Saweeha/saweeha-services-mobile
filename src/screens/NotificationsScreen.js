@@ -9,7 +9,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-// Constants
 import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../constants/typography';
 import { SIZES } from '../constants/sizes';

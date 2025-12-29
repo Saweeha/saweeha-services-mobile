@@ -37,7 +37,6 @@ const EditProfileScreen = ({ navigation }) => {
     }
   }, [error, dispatch]);
 
-  // Synchronize local state with user object when it changes (e.g. after checkAuthStatus)
   useEffect(() => {
     if (user) {
       setName(user.name || '');
@@ -174,8 +173,6 @@ const EditProfileScreen = ({ navigation }) => {
           ]}
           activeOpacity={0.8}
           onPress={() => {
-            // TODO: Hook to date picker modal
-            // For now just manually setting for demo or use a prompt
             Alert.alert('Date of Birth', 'Date picker will be integrated here.', [
               { text: 'Set Tomorrow', onPress: () => setDateOfBirth('2024-01-01') },
               { text: 'Cancel', style: 'cancel' }

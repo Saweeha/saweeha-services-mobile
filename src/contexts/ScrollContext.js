@@ -3,28 +3,18 @@ import { Animated } from 'react-native';
 
 const ScrollChannelContext = createContext(null);
 
-/**
- * Scroll channel structure:
- * {
- *   scrollY: Animated.Value,
- *   isCollapsed: Animated.Value (derived from scrollY > threshold, returns 0 or 1)
- * }
- */
-
 export const useScrollChannelContext = () => {
   const context = useContext(ScrollChannelContext);
   if (!context) {
-    // Return a no-op context if not available (for screens that don't need it)
     return {
       activeScrollChannel: null,
-      setActiveScrollChannel: () => {},
-      clearActiveScrollChannel: () => {},
+      setActiveScrollChannel: () => { },
+      clearActiveScrollChannel: () => { },
     };
   }
   return context;
 };
 
-// Legacy export for backward compatibility during migration
 export const useScrollContext = () => {
   console.warn('useScrollContext is deprecated. Use useScrollChannelContext instead.');
   return useScrollChannelContext();
@@ -54,6 +44,5 @@ export const ScrollChannelProvider = ({ children }) => {
   );
 };
 
-// Legacy export for backward compatibility during migration
 export const ScrollProvider = ScrollChannelProvider;
 

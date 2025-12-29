@@ -1,16 +1,13 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator, RefreshControl } from 'react-native';
 
-// Services
 import businessService from '../services/businessService';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
-// Components
 import CustomTabs from '../components/ui/CustomTabs/CustomTabs';
 import AutoScrollView from '../components/list/AutoScrollView/AutoScrollView';
 
-// New Components
 import BusinessHero from '../components/business/BusinessHero/BusinessHero';
 import BusinessInfo from '../components/business/BusinessInfo/BusinessInfo';
 import ServiceListItem from '../components/list/ServiceListItem/ServiceListItem';
@@ -22,7 +19,6 @@ import ProfessionalSelectionModal from '../components/modals/ProfessionalSelecti
 import ContinueButton from '../components/ui/ContinueButton/ContinueButton';
 import FloatingContinueButton from '../components/ui/FloatingContinueButton/FloatingContinueButton';
 
-// Constants & Hooks
 import { SPACING } from '../constants/spacing';
 import { useTheme } from '../hooks/useTheme';
 import { formatRelativeDate } from '../utils/date';
@@ -38,16 +34,13 @@ const BusinessScreen = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [isAtBottom, setIsAtBottom] = useState(false);
 
-  // API state
   const [businessData, setBusinessData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedBranchId, setSelectedBranchId] = useState(null);
 
-  // Get business ID from route params
   const businessId = route.params?.business?.id;
 
-  // All available business images (fallback images)
   const allBusinessImages = [
     require('../../assets/businesses/pexels-delbeautybox-211032-705255.jpg'),
     require('../../assets/businesses/pexels-delbeautybox-211032-853427.jpg'),
@@ -56,7 +49,6 @@ const BusinessScreen = () => {
     require('../../assets/businesses/pexels-cottonbro-3992874.jpg'),
   ];
 
-  // Fetch business details from API
   const fetchBusinessDetails = useCallback(async () => {
     if (!businessId) {
       setLoading(false);
@@ -70,7 +62,6 @@ const BusinessScreen = () => {
 
       if (response?.success && response?.data) {
         setBusinessData(response.data);
-        // Initialize selected branch ID if not set
         if (!selectedBranchId && response.data.branches?.length > 0) {
           setSelectedBranchId(response.data.branches[0].id);
         }
@@ -86,13 +77,11 @@ const BusinessScreen = () => {
     }
   }, [businessId]);
 
-  // Initial load
   useEffect(() => {
     setLoading(true);
     fetchBusinessDetails();
   }, [fetchBusinessDetails]);
 
-  // Pull-to-refresh state and handler
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(() => {
@@ -100,7 +89,6 @@ const BusinessScreen = () => {
     fetchBusinessDetails();
   }, [fetchBusinessDetails]);
 
-  // Get the selected branch data (with full details) from API response
   const selectedBranch = useMemo(() => {
     const branches = businessData?.branches;
     if (!branches || !Array.isArray(branches) || branches.length === 0) {
@@ -110,9 +98,7 @@ const BusinessScreen = () => {
     return branches.find(b => b.id === selectedBranchId) || branches[0];
   }, [businessData, selectedBranchId]);
 
-  // Build business object with null safety
   const business = useMemo(() => {
-    // Get business images from selected branch, with fallback to default images
     const branchImages = selectedBranch?.images || [];
     const imageUrls = branchImages
       .filter(img => img?.original_url)
@@ -121,7 +107,6 @@ const BusinessScreen = () => {
         thumbnail: img.thumbnail_url || null
       }));
 
-    // For API images, include both uri and thumbnail for progressive loading
     const images = imageUrls.length > 0
       ? imageUrls
       : allBusinessImages.map(img => ({ source: img, thumbnail: null }));
@@ -145,7 +130,6 @@ const BusinessScreen = () => {
       })),
       images: images,
       image: firstImage,
-      // branch specific data
       selectedBranchId: selectedBranch?.id || null,
       selectedBranch: selectedBranch,
       categories: selectedBranch?.categories || [],
@@ -154,9 +138,6 @@ const BusinessScreen = () => {
     };
   }, [businessData, selectedBranch, businessId, allBusinessImages]);
 
-  // Note: Header title is now managed entirely by navigation via route params
-  // No screen-level header configuration allowed per design constraints
-
   const tabs = [
     { id: 'services', label: 'Services' },
     { id: 'team', label: 'Team' },
@@ -164,7 +145,6 @@ const BusinessScreen = () => {
     { id: 'about', label: 'About' },
   ];
 
-  // Service categories - dynamically built from API data
   const serviceCategories = useMemo(() => {
     const categories = [{ id: 'all', label: 'All' }];
 
@@ -180,7 +160,6 @@ const BusinessScreen = () => {
     return categories;
   }, [business.categories]);
 
-  // Normalize API services for UI (with null safety)
   const normalizedServices = useMemo(() => {
     const allServices = [];
 
@@ -203,7 +182,6 @@ const BusinessScreen = () => {
     return allServices;
   }, [business.categories]);
 
-  // Filter services based on selected category
   const filteredServices = useMemo(() => {
     if (activeServiceCategory === 'all') {
       return normalizedServices;
@@ -211,7 +189,6 @@ const BusinessScreen = () => {
     return normalizedServices.filter(service => service.category === activeServiceCategory);
   }, [activeServiceCategory, normalizedServices]);
 
-  // Normalize team members from API (with null safety)
   const teamMembers = useMemo(() => {
     return (business.professionals || []).map(professional => ({
       id: professional?.id || Math.random().toString(),
@@ -226,7 +203,6 @@ const BusinessScreen = () => {
     }));
   }, [business.professionals]);
 
-  // Normalize reviews from API (with null safety)
   const reviews = useMemo(() => {
     return (business.reviews || []).map(review => ({
       id: review?.id || Math.random().toString(),
@@ -241,7 +217,6 @@ const BusinessScreen = () => {
   }, [business.reviews]);
 
 
-  // Helper function to format opening hours
   const formatOpeningHours = (hours) => {
     if (!hours) return 'Hours not available';
 
@@ -273,41 +248,31 @@ const BusinessScreen = () => {
     return lines.join('\n');
   };
 
-  // Get available professionals for a service
-  // Note: Since API data doesn't have specialty matching, 
-  // we return all professionals from the branch
   const getAvailableProfessionals = useCallback((service) => {
     if (!service) return [];
-    // Return all team members since API doesn't provide specialty filtering
     return teamMembers;
   }, [teamMembers]);
 
-  // Handle service press - open professional selection modal or unselect if already selected
   const handleServicePress = (service) => {
     const existingService = selectedServices.find(s => s.id === service.id);
 
     if (existingService) {
-      // If service is already selected, unselect it
       setSelectedServices(prev => prev.filter(s => s.id !== service.id));
     } else {
-      // If service is not selected, open modal to select professional
       setSelectedService(service);
       setProfessionalModalVisible(true);
     }
   };
 
-  // Handle long press - allow changing professional for already selected service
   const handleServiceLongPress = (service) => {
     const existingService = selectedServices.find(s => s.id === service.id);
 
     if (existingService) {
-      // Open modal to change professional
       setSelectedService(service);
       setProfessionalModalVisible(true);
     }
   };
 
-  // Handle professional selection
   const handleProfessionalSelection = (professional) => {
     if (!selectedService) return;
 
@@ -327,28 +292,23 @@ const BusinessScreen = () => {
     });
   };
 
-  // Handle scroll to detect if at bottom
   const handleScroll = useCallback((event) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    const paddingToBottom = 100; // Threshold for "at bottom"
+    const paddingToBottom = 100;
     const isBottom =
       layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
     setIsAtBottom(isBottom);
   }, []);
 
-  // Handle branch selection
   const handleBranchSelect = (branch) => {
     setSelectedBranchId(branch.id);
-    // Clear selected services when switching branches as services might differ
     setSelectedServices([]);
-    // Reset service category filter
     setActiveServiceCategory('all');
   };
 
   const handleContinue = () => {
     if (selectedServices.length === 0) return;
 
-    // Check auth before navigating - handled by RootNavigator listener
     navigation.navigate('BookingDateTime', {
       selectedServices,
       business,
@@ -455,7 +415,6 @@ const BusinessScreen = () => {
     }
   };
 
-  // Loading state
   if (loading) {
     return (
       <SafeAreaView
@@ -467,7 +426,6 @@ const BusinessScreen = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <SafeAreaView
@@ -520,7 +478,6 @@ const BusinessScreen = () => {
 
         {renderContent()}
 
-        {/* Relative Continue Button at bottom of content */}
         {selectedServices.length > 0 && (
           <View style={styles.bottomButtonContainer}>
             <ContinueButton
@@ -548,7 +505,6 @@ const BusinessScreen = () => {
         onSelectProfessional={handleProfessionalSelection}
       />
 
-      {/* Floating Continue Button */}
       <FloatingContinueButton
         visible={selectedServices.length > 0 && !isAtBottom}
         onPress={handleContinue}

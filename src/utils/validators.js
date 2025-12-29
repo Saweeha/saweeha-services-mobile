@@ -1,12 +1,3 @@
-/**
- * Validation utility functions
- */
-
-/**
- * Validates email format
- * @param {string} email - Email address to validate
- * @returns {object} - { isValid: boolean, error: string }
- */
 export const validateEmail = (email) => {
   if (!email || email.trim() === '') {
     return { isValid: false, error: 'Email is required' };
@@ -20,13 +11,6 @@ export const validateEmail = (email) => {
   return { isValid: true, error: null };
 };
 
-/**
- * Validates password strength
- * @param {string} password - Password to validate
- * @param {object} options - Validation options
- * @param {number} options.minLength - Minimum password length (default: 8)
- * @returns {object} - { isValid: boolean, error: string }
- */
 export const validatePassword = (password, options = {}) => {
   const { minLength = 8 } = options;
 
@@ -41,7 +25,6 @@ export const validatePassword = (password, options = {}) => {
     };
   }
 
-  // Check for at least one letter and one number
   const hasLetter = /[a-zA-Z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
 
@@ -55,11 +38,6 @@ export const validatePassword = (password, options = {}) => {
   return { isValid: true, error: null };
 };
 
-/**
- * Validates full name
- * @param {string} name - Full name to validate
- * @returns {object} - { isValid: boolean, error: string }
- */
 export const validateFullName = (name) => {
   if (!name || name.trim() === '') {
     return { isValid: false, error: 'Full name is required' };
@@ -70,13 +48,11 @@ export const validateFullName = (name) => {
     return { isValid: false, error: 'Name must be at least 2 characters long' };
   }
 
-  // Check if name contains at least first and last name (2 words)
   const nameParts = trimmedName.split(/\s+/).filter((part) => part.length > 0);
   if (nameParts.length < 2) {
     return { isValid: false, error: 'Please enter your first and last name' };
   }
 
-  // Check if each part is valid (at least 2 characters)
   const invalidParts = nameParts.filter((part) => part.length < 2);
   if (invalidParts.length > 0) {
     return { isValid: false, error: 'Each name part must be at least 2 characters' };
@@ -85,11 +61,6 @@ export const validateFullName = (name) => {
   return { isValid: true, error: null };
 };
 
-/**
- * Validates phone number with country code
- * @param {string} phone - Phone number to validate (should start with +)
- * @returns {object} - { isValid: boolean, error: string }
- */
 export const validatePhone = (phone) => {
   if (!phone || phone.trim() === '') {
     return { isValid: false, error: 'Phone number is required' };
@@ -97,18 +68,15 @@ export const validatePhone = (phone) => {
 
   const trimmedPhone = phone.trim();
 
-  // Must start with +
   if (!trimmedPhone.startsWith('+')) {
     return { isValid: false, error: 'Phone number must start with country code (e.g., +966)' };
   }
 
-  // Remove the + and check the rest is all digits
   const digits = trimmedPhone.slice(1).replace(/\s/g, '');
   if (!/^\d+$/.test(digits)) {
     return { isValid: false, error: 'Phone number should only contain digits after the country code' };
   }
 
-  // Check length (country code + number should be 10-15 digits)
   if (digits.length < 10 || digits.length > 15) {
     return { isValid: false, error: 'Please enter a valid phone number with country code' };
   }
@@ -116,12 +84,6 @@ export const validatePhone = (phone) => {
   return { isValid: true, error: null };
 };
 
-/**
-   * Validates that two passwords match
-   * @param {string} password - Original password
-   * @param {string} confirmPassword - Password confirmation
-   * @returns {object} - { isValid: boolean, error: string }
-   */
 export const validatePasswordMatch = (password, confirmPassword) => {
   if (!confirmPassword || confirmPassword.trim() === '') {
     return { isValid: false, error: 'Please confirm your password' };
@@ -134,11 +96,6 @@ export const validatePasswordMatch = (password, confirmPassword) => {
   return { isValid: true, error: null };
 };
 
-/**
- * Validates login form
- * @param {object} formData - { email, password }
- * @returns {object} - { isValid: boolean, errors: object }
- */
 export const validateLoginForm = (formData) => {
   const { email, password } = formData;
   const errors = {};
@@ -158,11 +115,6 @@ export const validateLoginForm = (formData) => {
   };
 };
 
-/**
- * Validates registration form
- * @param {object} formData - { fullName, email, phone, password, confirmPassword }
- * @returns {object} - { isValid: boolean, errors: object }
- */
 export const validateRegisterForm = (formData) => {
   const { fullName, email, phone, password, confirmPassword } = formData;
   const errors = {};
@@ -187,7 +139,6 @@ export const validateRegisterForm = (formData) => {
     errors.password = passwordValidation.error;
   }
 
-  // Only validate password match if password itself is valid
   if (passwordValidation.isValid) {
     const passwordMatchValidation = validatePasswordMatch(password, confirmPassword);
     if (!passwordMatchValidation.isValid) {

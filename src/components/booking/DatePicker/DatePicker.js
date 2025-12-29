@@ -8,13 +8,11 @@ const DatePicker = React.memo(({ selectedDate, onDateSelect, minDate }) => {
   const { colors } = useTheme();
   const styles = useMemo(() => createDatePickerStyles(colors), [colors]);
 
-  // Generate dates for the next 30 days
   const availableDates = useMemo(() => {
     const dates = [];
     const today = new Date();
     const startDate = minDate ? new Date(minDate) : today;
 
-    // Start from today or minDate, whichever is later
     const start = startDate > today ? startDate : today;
 
     for (let i = 0; i < 30; i++) {

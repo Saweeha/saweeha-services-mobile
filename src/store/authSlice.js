@@ -3,8 +3,6 @@ import { authService } from '../services/authService';
 import { userService } from '../services/userService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Async Thunks
-
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
@@ -44,7 +42,6 @@ export const verifyEmail = createAsyncThunk(
   async ({ code }, { rejectWithValue }) => {
     try {
       const response = await authService.verifyEmail(code);
-      // Store tokens only (not user data)
       if (response.success && response.data.token) {
         await AsyncStorage.setItem('token', response.data.token);
         await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
@@ -74,10 +71,8 @@ export const logoutUser = createAsyncThunk(
     try {
       await authService.logout();
     } catch (error) {
-      // Even if API call fails, we still want to clear local storage
       console.error('Logout API error:', error.message);
     }
-    // Always clear storage regardless of API result
     await AsyncStorage.multiRemove(['token', 'refreshToken']);
     return true;
   }
@@ -98,8 +93,6 @@ export const checkAuthStatus = createAsyncThunk(
         throw new Error('Failed to get user');
       }
     } catch (error) {
-      // ONLY clear tokens if it's an authentication error (401 or 403)
-      // Don't clear on network errors or other server errors (500)
       if (error.response?.status === 401 || error.response?.status === 403) {
         await AsyncStorage.multiRemove(['token', 'refreshToken']);
       }
@@ -150,14 +143,14 @@ const initialState = {
   loading: false,
   error: null,
   showAuthModal: false,
-  attemptedProtectedRoute: null, // Store which route was attempted
-  hasShownLaunchModal: false, // Track if modal was shown on app launch
-  authModalType: 'login', // 'login' | 'register'
+  attemptedProtectedRoute: null,
+  hasShownLaunchModal: false,
+  authModalType: 'login',
   showForgotPasswordModal: false,
   showOtpModal: false,
-  otpContext: null, // 'reset' | 'register'
+  otpContext: null,
   otpEmail: null,
-  verificationSuccess: false, // For tracking OTP success
+  verificationSuccess: false,
 };
 
 const authSlice = createSlice({
@@ -209,7 +202,6 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Login
     builder
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
@@ -227,7 +219,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Register
     builder
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
@@ -235,12 +226,10 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        // Don't set authenticated yet, wait for verification
-        // Show OTP modal
         state.showOtpModal = true;
         state.otpContext = 'register';
         state.otpEmail = action.meta.arg.email;
-        state.showAuthModal = false; // Close register modal
+        state.showAuthModal = false;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -248,7 +237,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Verify Email
     builder
       .addCase(verifyEmail.pending, (state) => {
         state.loading = true;
@@ -267,14 +255,12 @@ const authSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Logout
     builder
       .addCase(logoutUser.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
       });
 
-    // Check Auth Status
     builder
       .addCase(checkAuthStatus.pending, (state) => {
         state.loading = true;
@@ -283,19 +269,14 @@ const authSlice = createSlice({
       .addCase(checkAuthStatus.fulfilled, (state, action) => {
         state.loading = false;
         state.isAuthenticated = true;
-        // The API returns { success: true, message: "...", data: { user: { ... } } }
-        // checkAuthStatus thunk returns response.data, which is { user: { ... } }
-        // BUT let's be safe and check if it's already unwrapped or not
         state.user = action.payload?.user || action.payload;
       })
       .addCase(checkAuthStatus.rejected, (state, action) => {
         state.loading = false;
         state.isAuthenticated = false;
         state.user = null;
-        // Don't set error message here as it might be a silent background check
       });
 
-    // Resend Code
     builder
       .addCase(resendVerificationCode.pending, (state) => {
         state.loading = true;
@@ -309,7 +290,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Forgot Password
     builder
       .addCase(forgotPassword.pending, (state) => {
         state.loading = true;
@@ -317,10 +297,9 @@ const authSlice = createSlice({
       })
       .addCase(forgotPassword.fulfilled, (state, action) => {
         state.loading = false;
-        // Show OTP modal for reset
         state.showOtpModal = true;
         state.otpContext = 'reset';
-        state.otpEmail = action.meta.arg; // email argument
+        state.otpEmail = action.meta.arg;
         state.showForgotPasswordModal = false;
       })
       .addCase(forgotPassword.rejected, (state, action) => {
@@ -328,7 +307,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Reset Password
     builder
       .addCase(resetPassword.pending, (state) => {
         state.loading = true;
@@ -337,16 +315,14 @@ const authSlice = createSlice({
       .addCase(resetPassword.fulfilled, (state) => {
         state.loading = false;
         state.showOtpModal = false;
-        state.showAuthModal = true; // Show login modal
+        state.showAuthModal = true;
         state.authModalType = 'login';
-        // Maybe show success message?
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
 
-    // Update User Profile
     builder
       .addCase(updateUserProfile.pending, (state) => {
         state.loading = true;

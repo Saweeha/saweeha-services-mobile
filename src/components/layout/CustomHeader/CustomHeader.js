@@ -20,10 +20,8 @@ const CustomHeader = React.memo(({
 
   return (
     <View style={[styles.container, { height: headerHeight, paddingTop: insets.top }]}>
-      {/* Main Content */}
       <View style={styles.contentWrapper}>
         <View style={styles.contentContainer}>
-          {/* Left Section - Back Button */}
           {showBackButton && onBackPress ? (
             <TouchableOpacity
               onPress={onBackPress}
@@ -32,10 +30,10 @@ const CustomHeader = React.memo(({
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <View style={styles.backButtonContainer}>
-                <Ionicons 
-                  name="arrow-back" 
-                  size={22} 
-                  color={colors.primary} 
+                <Ionicons
+                  name="arrow-back"
+                  size={22}
+                  color={colors.primary}
                 />
               </View>
             </TouchableOpacity>
@@ -43,21 +41,18 @@ const CustomHeader = React.memo(({
             <View style={styles.backButtonPlaceholder} />
           )}
 
-          {/* Center Section - Title */}
           <View style={styles.titleContainer}>
             <Text style={styles.title} numberOfLines={1}>
               {title}
             </Text>
           </View>
 
-          {/* Right Section - Custom Component */}
           <View style={styles.rightContainer}>
             {rightComponent || <View style={styles.placeholder} />}
           </View>
         </View>
       </View>
 
-      {/* Elegant Bottom Divider with gradient */}
       <View style={styles.dividerContainer}>
         <View style={styles.divider} />
       </View>

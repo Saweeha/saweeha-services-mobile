@@ -10,10 +10,8 @@ import createBusinessHeroStyles from './BusinessHero.styles';
 
 const { width, height } = Dimensions.get('window');
 
-// Module-level cache to track loaded image URLs (persists across re-renders)
 const loadedImagesCache = new Set();
 
-// Clean ProgressiveImage component - shows thumbnail until original loads
 const ProgressiveImage = React.memo(({ source, thumbnail, style, resizeMode = 'cover' }) => {
   const imageUri = source?.uri;
   const [isLoaded, setIsLoaded] = useState(imageUri ? loadedImagesCache.has(imageUri) : true);
@@ -31,7 +29,6 @@ const ProgressiveImage = React.memo(({ source, thumbnail, style, resizeMode = 'c
     }
   };
 
-  // No thumbnail or local image - just render normally
   if (!thumbnail || !imageUri) {
     return <Image source={source} style={style} resizeMode={resizeMode} />;
   }
@@ -43,14 +40,12 @@ const ProgressiveImage = React.memo(({ source, thumbnail, style, resizeMode = 'c
 
   return (
     <View style={style}>
-      {/* Thumbnail - fades out as original fades in */}
       <Animated.Image
         source={{ uri: thumbnail }}
         style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, style, { opacity: thumbnailOpacity }]}
         resizeMode={resizeMode}
         blurRadius={2}
       />
-      {/* Original - fades in over thumbnail */}
       <Animated.Image
         source={source}
         style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, style, { opacity: fadeAnim }]}
@@ -79,19 +74,14 @@ const BusinessHero = React.memo(({ images = [] }) => {
     return null;
   }
 
-  // Helper function to get image source from the new format
   const getImageSource = (image) => {
     if (!image) return null;
-    // If it has a uri property (API image)
     if (image.uri) return { uri: image.uri };
-    // If it has a source property (local image)
     if (image.source) return image.source;
-    // If it's a number (require() result) or has uri directly
     if (typeof image === 'number') return image;
     return image;
   };
 
-  // Auto-play: advance slide every 4 seconds
   useEffect(() => {
     if (!images || images.length <= 1 || isAutoplayPaused) {
       return;
@@ -133,7 +123,6 @@ const BusinessHero = React.memo(({ images = [] }) => {
     setIsAutoplayPaused(true);
     setExpandedIndex(currentIndex);
     setIsExpanded(true);
-    // Scroll expanded view to current image
     setTimeout(() => {
       expandedScrollViewRef.current?.scrollTo({
         x: currentIndex * width,
@@ -186,7 +175,6 @@ const BusinessHero = React.memo(({ images = [] }) => {
           ))}
         </ScrollView>
 
-        {/* Favorite Button */}
         <View style={styles.favoriteButtonContainer}>
           <TouchableOpacity
             style={styles.favoriteButton}
@@ -240,7 +228,6 @@ const BusinessHero = React.memo(({ images = [] }) => {
         )}
       </View>
 
-      {/* Full Screen Image Viewer Modal */}
       <Modal
         visible={isExpanded}
         transparent

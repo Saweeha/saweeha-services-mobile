@@ -18,7 +18,6 @@ const PromotionSwiper = React.memo(({ promotions = [], onPress }) => {
   const pagerRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(0);
 
-  // Auto-play: advance slide every 4 seconds
   useEffect(() => {
     if (!promotions || promotions.length <= 1) {
       return undefined;

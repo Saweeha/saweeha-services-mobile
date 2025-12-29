@@ -4,9 +4,9 @@ import { SIZES } from '../../../constants/sizes';
 import { TYPOGRAPHY } from '../../../constants/typography';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = width * 0.75; // 75% of screen width for horizontal scroll
-const DEFAULT_IMAGE_HEIGHT = 180; // Default height for horizontal scroll cards
-const GRID_IMAGE_ASPECT_RATIO = 0.75; // Height/Width ratio for grid cards
+const CARD_WIDTH = width * 0.75;
+const DEFAULT_IMAGE_HEIGHT = 180;
+const GRID_IMAGE_ASPECT_RATIO = 0.75;
 
 const createBusinessCardStyles = (colors, customWidth) => {
   const cardWidth = customWidth || CARD_WIDTH;
@@ -31,7 +31,7 @@ const createBusinessCardStyles = (colors, customWidth) => {
       width: '100%',
       height: imageHeight,
       backgroundColor: colors.border,
-      borderRadius: SIZES.radius.lg, // Optional if container clips it, but good to have
+      borderRadius: SIZES.radius.lg,
     },
     ratingContainer: {
       position: 'absolute',

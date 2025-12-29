@@ -100,7 +100,6 @@ const BookingCard = React.memo(({ booking, onCancel }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundLight, borderColor: colors.border }]}>
-      {/* Header Section */}
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => setIsExpanded(!isExpanded)}
@@ -112,7 +111,6 @@ const BookingCard = React.memo(({ booking, onCancel }) => {
             resizeMode="cover"
           />
 
-          {/* Business Info */}
           <View style={styles.businessInfo}>
             <Text style={[styles.businessName, { color: colors.text }]} numberOfLines={1}>
               {booking.business?.name || 'Business Name'}
@@ -128,7 +126,6 @@ const BookingCard = React.memo(({ booking, onCancel }) => {
             </View>
           </View>
 
-          {/* Status & Expand */}
           <View style={styles.rightSection}>
             <View style={[styles.statusBadge, { backgroundColor: statusConfig.bgColor }]}>
               <Text style={[styles.statusText, { color: statusConfig.color }]}>
@@ -144,10 +141,8 @@ const BookingCard = React.memo(({ booking, onCancel }) => {
         </View>
       </TouchableOpacity>
 
-      {/* Expanded Content */}
       {isExpanded && (
         <View style={[styles.expandedContent, { borderTopColor: colors.border }]}>
-          {/* Full Date */}
           <View style={styles.fullDateContainer}>
             <Ionicons name="calendar-outline" size={16} color={colors.textLight} />
             <Text style={[styles.fullDateText, { color: colors.textSecondary, marginLeft: SPACING.xs }]}>
@@ -155,7 +150,6 @@ const BookingCard = React.memo(({ booking, onCancel }) => {
             </Text>
           </View>
 
-          {/* Services List */}
           {booking.services && booking.services.length > 0 && (
             <View style={styles.servicesContainer}>
               {booking.services.map((service, index) => (
@@ -177,7 +171,6 @@ const BookingCard = React.memo(({ booking, onCancel }) => {
             </View>
           )}
 
-          {/* Branch Info */}
           {booking.branch && (
             <View style={styles.branchContainer}>
               <Ionicons name="location" size={16} color={colors.textLight} />
@@ -192,7 +185,6 @@ const BookingCard = React.memo(({ booking, onCancel }) => {
             </View>
           )}
 
-          {/* Total Price */}
           <View style={[styles.totalContainer, { backgroundColor: colors.primary + '08' }]}>
             <Text style={[styles.totalLabel, { color: colors.textSecondary }]}>Total</Text>
             <Text style={[styles.totalPrice, { color: colors.primary }]}>
@@ -200,7 +192,6 @@ const BookingCard = React.memo(({ booking, onCancel }) => {
             </Text>
           </View>
 
-          {/* Action Buttons */}
           {isUpcoming && (
             <View style={styles.actionsContainer}>
               <TouchableOpacity

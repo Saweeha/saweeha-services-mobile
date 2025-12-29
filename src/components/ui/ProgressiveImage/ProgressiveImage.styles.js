@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 const createProgressiveImageStyles = (colors) => StyleSheet.create({
     container: {
-        backgroundColor: '#e1e4e8', // Default background for loading state
+        backgroundColor: '#e1e4e8',
         overflow: 'hidden',
     },
     imageOverlay: {

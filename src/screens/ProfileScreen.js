@@ -22,16 +22,14 @@ const ProfileScreen = () => {
 
   const handleItemPress = (item) => {
     if (item.type === 'switch') {
-      return; // Switch handles its own state
+      return;
     }
 
-    // Custom onPress handlers (e.g. logout, sign in)
     if (item.onPress) {
       item.onPress();
       return;
     }
 
-    // Navigation targets based on item id
     if (item.id === 'edit') {
       navigation.navigate('EditProfile');
       return;
@@ -75,20 +73,17 @@ const ProfileScreen = () => {
     dispatch(showAuthModal({ routeName: null, type: 'login' }));
   };
 
-  // Menu items that require authentication
   const authenticatedMenuItems = [
     { id: 'edit', label: 'Edit Profile', icon: 'create-outline', type: 'action' },
     { id: 'notifications', label: 'Notifications', icon: 'notifications-outline', type: 'action' },
   ];
 
-  // Menu items that are always visible
   const publicMenuItems = [
     { id: 'help', label: 'Help & Support', icon: 'help-circle-outline', type: 'action' },
     { id: 'about', label: 'About', icon: 'information-circle-outline', type: 'action' },
     { id: 'dark-mode', label: 'Dark Mode', icon: isDark ? 'moon' : 'moon-outline', type: 'switch', value: isDark, onToggle: toggleScheme },
   ];
 
-  // Build menu items based on auth state
   const menuItems = isAuthenticated
     ? [
       ...authenticatedMenuItems,
@@ -206,7 +201,6 @@ const ProfileScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Section */}
         <View style={styles.profileSection}>
           <View style={[styles.avatar, { backgroundColor: colors.primaryLight, overflow: 'hidden' }]}>
             {isAuthenticated && user?.profile_picture_url ? (
@@ -238,7 +232,6 @@ const ProfileScreen = () => {
           )}
         </View>
 
-        {/* Menu Items */}
         <View style={styles.menuSection}>
           {menuItems.map((item, index) => renderMenuItem(item, index))}
         </View>

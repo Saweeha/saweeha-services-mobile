@@ -64,18 +64,12 @@ const LoginModal = () => {
       return;
     }
 
-    // Clear errors and proceed with login
     setErrors({});
     dispatch(loginUser({ email, password }));
-    // handleClose(); // Let the thunk success handler close the modal
   };
 
   const handleSocialLogin = () => {
-    // Social auth bypasses form validation
-    // In a real app, this would trigger Google/Facebook auth flow
-    // dispatch(login());
     alert('Social login not implemented yet');
-    // handleClose();
   };
 
   const switchToRegister = () => {
@@ -85,7 +79,6 @@ const LoginModal = () => {
   };
 
   const handleForgotPassword = () => {
-    // Close login sheet then open the standalone Forgot Password modal
     dispatch(hideAuthModal());
     dispatch(openForgotPasswordModal({ email }));
   };
@@ -105,7 +98,6 @@ const LoginModal = () => {
           style={styles.keyboardView}
         >
           <View style={[styles.modalContent, { backgroundColor: colors.backgroundLight }]}>
-            {/* Header */}
             <View style={styles.header}>
               <Text style={[styles.title, { color: colors.text }]}>Welcome Back</Text>
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
@@ -120,7 +112,6 @@ const LoginModal = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Form */}
             <ScrollView
               style={styles.formContainer}
               contentContainerStyle={styles.formContentContainer}

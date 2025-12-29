@@ -21,7 +21,7 @@ const OtpModal = () => {
   const [code, setCode] = useState('');
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
-  // For password reset flow
+
   const [showNewPasswordForm, setShowNewPasswordForm] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -40,16 +40,13 @@ const OtpModal = () => {
 
   useEffect(() => {
     if (showOtpModal) {
-      // Focus the input when modal opens
       setTimeout(() => {
         inputRef.current?.focus();
       }, 300);
-      // Reset state when modal opens
       setShowNewPasswordForm(false);
       setNewPassword('');
       setConfirmPassword('');
     } else {
-      // Clear code when modal closes
       setCode('');
     }
   }, [showOtpModal]);
@@ -74,7 +71,6 @@ const OtpModal = () => {
     const type = otpContext === 'register' ? 'registration' : 'password_reset';
     dispatch(resendVerificationCode({ email: otpEmail, type }));
 
-    // Start cooldown timer
     setResendDisabled(true);
     setResendTimer(60);
   };
@@ -83,10 +79,8 @@ const OtpModal = () => {
     if (code.length !== 6) return;
 
     if (otpContext === 'register') {
-      // For registration, verify email and auto-login (Bearer token identifies user)
       dispatch(verifyEmail({ code }));
     } else if (otpContext === 'reset') {
-      // For password reset, show the new password form
       setShowNewPasswordForm(true);
     }
   };
@@ -97,10 +91,8 @@ const OtpModal = () => {
     dispatch(resetPassword({ email: otpEmail, code, newPassword }));
   };
 
-  // Auto-confirm when code is complete
   useEffect(() => {
     if (code.length === 6 && !showNewPasswordForm) {
-      // Small delay to show the last digit before confirming
       const timer = setTimeout(() => {
         handleVerifyCode();
       }, 300);
@@ -133,7 +125,6 @@ const OtpModal = () => {
           style={styles.keyboardView}
         >
           <View style={[styles.modalContent, { backgroundColor: colors.backgroundLight }]}>
-            {/* Header */}
             <View style={styles.header}>
               <Text style={[styles.title, { color: colors.text }]}>
                 {showNewPasswordForm ? 'Reset Password' : title}
@@ -151,7 +142,6 @@ const OtpModal = () => {
             </View>
 
             <View style={otpStyles.container}>
-              {/* Error Message */}
               {error && (
                 <Text style={{ color: colors.error, marginBottom: 10, textAlign: 'center' }}>
                   {error}
@@ -162,7 +152,6 @@ const OtpModal = () => {
 
               {!showNewPasswordForm ? (
                 <>
-                  {/* OTP Input Boxes */}
                   <TouchableOpacity
                     activeOpacity={1}
                     onPress={focusInput}
@@ -208,7 +197,6 @@ const OtpModal = () => {
                     })}
                   </TouchableOpacity>
 
-                  {/* Hidden TextInput to capture input */}
                   <TextInput
                     ref={inputRef}
                     value={code}
@@ -228,7 +216,6 @@ const OtpModal = () => {
                 </>
               ) : (
                 <>
-                  {/* New Password Form for Reset */}
                   <AuthTextInput
                     label="New Password"
                     icon="lock-closed-outline"

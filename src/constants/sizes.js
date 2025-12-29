@@ -5,15 +5,13 @@ const { width, height } = Dimensions.get('window');
 export const SIZES = {
   width,
   height,
-  
-  // Component sizes
+
   headerHeight: 60,
   tabBarHeight: 90,
   cardHeight: 200,
   categoryCardSize: 80,
   businessCardHeight: 120,
-  
-  // Border radius
+
   radius: {
     sm: 8,
     md: 12,
@@ -21,8 +19,7 @@ export const SIZES = {
     xl: 24,
     round: 9999,
   },
-  
-  // Shadows
+
   shadow: {
     small: {
       shadowColor: '#000',

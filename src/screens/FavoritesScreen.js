@@ -21,7 +21,6 @@ const FavoritesScreen = () => {
   const { colors } = useTheme();
   useAuthGuard('Favorites');
 
-  // Mock data - replace with API calls later
   const [favorites] = useState([
     {
       id: '1',
@@ -113,14 +112,12 @@ const FavoritesScreen = () => {
       style={[styles.container, { backgroundColor: colors.background }]}
       edges={['top']}
     >
-      {/* Header */}
       <ScreenHeader
         title="Favorites"
         count={favorites.length > 0 ? favorites.length : undefined}
         countLabel="favorite"
       />
 
-      {/* List */}
       {favorites.length > 0 ? (
         <FlatList
           data={favorites}
