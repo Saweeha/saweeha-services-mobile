@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../../hooks/useTheme';
-import { SPACING } from '../../../constants/spacing';
-import { SIZES } from '../../../constants/sizes';
+import createTeamListItemStyles from './TeamListItem.styles';
 
 const TeamListItem = React.memo(({ name, role, experience, specialties = [] }) => {
   const { colors } = useTheme();
+  const styles = useMemo(() => createTeamListItemStyles(colors), [colors]);
 
   return (
     <View
@@ -68,66 +68,6 @@ TeamListItem.propTypes = {
   specialties: PropTypes.arrayOf(PropTypes.string),
 };
 
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: SIZES.radius.md,
-    padding: SPACING.md,
-    borderWidth: 1,
-    gap: SPACING.md,
-    ...SIZES.shadow.small,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.md,
-  },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  info: {
-    flex: 1,
-    gap: SPACING.xs / 2,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  role: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  experience: {
-    alignItems: 'center',
-    gap: 2,
-  },
-  experienceValue: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  experienceLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  specialties: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.xs,
-  },
-  specialtyTag: {
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: SIZES.radius.sm,
-    borderWidth: 1,
-  },
-  specialtyText: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-});
-
 export default TeamListItem;
+
 

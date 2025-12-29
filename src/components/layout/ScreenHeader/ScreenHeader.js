@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, StyleSheet } from 'react-native';
-import { SPACING } from '../../../constants/spacing';
-import { TYPOGRAPHY } from '../../../constants/typography';
+import { View, Text } from 'react-native';
 import { useTheme } from '../../../hooks/useTheme';
+import createScreenHeaderStyles from './ScreenHeader.styles';
 
 const ScreenHeader = React.memo(({ title, subtitle, count, countLabel }) => {
   const { colors } = useTheme();
+  const styles = useMemo(() => createScreenHeaderStyles(colors), [colors]);
 
   const getSubtitleText = () => {
     if (subtitle) {
@@ -43,21 +43,6 @@ ScreenHeader.propTypes = {
   countLabel: PropTypes.string,
 };
 
-const styles = StyleSheet.create({
-  header: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.md,
-  },
-  headerTitle: {
-    fontSize: TYPOGRAPHY.fontSize.xxxl,
-    fontFamily: TYPOGRAPHY.fontFamily.bold,
-    marginBottom: SPACING.xs,
-  },
-  headerSubtitle: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    fontFamily: TYPOGRAPHY.fontFamily.regular,
-  },
-});
-
 export default ScreenHeader;
+
 

@@ -1,29 +1,28 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useTheme } from '../../../hooks/useTheme';
-import { SPACING } from '../../../constants/spacing';
-import { SIZES } from '../../../constants/sizes';
+import createDatePickerStyles from './DatePicker.styles';
 
 const DatePicker = React.memo(({ selectedDate, onDateSelect, minDate }) => {
   const { colors } = useTheme();
+  const styles = useMemo(() => createDatePickerStyles(colors), [colors]);
 
   // Generate dates for the next 30 days
   const availableDates = useMemo(() => {
     const dates = [];
     const today = new Date();
     const startDate = minDate ? new Date(minDate) : today;
-    
+
     // Start from today or minDate, whichever is later
     const start = startDate > today ? startDate : today;
-    
+
     for (let i = 0; i < 30; i++) {
       const date = new Date(start);
       date.setDate(start.getDate() + i);
       dates.push(date);
     }
-    
+
     return dates;
   }, [minDate]);
 
@@ -75,13 +74,13 @@ const DatePicker = React.memo(({ selectedDate, onDateSelect, minDate }) => {
                   backgroundColor: selected
                     ? colors.primary
                     : today
-                    ? colors.primaryLight
-                    : colors.backgroundLight,
+                      ? colors.primaryLight
+                      : colors.backgroundLight,
                   borderColor: selected
                     ? colors.primary
                     : today
-                    ? colors.primary
-                    : colors.border,
+                      ? colors.primary
+                      : colors.border,
                 },
               ]}
               onPress={() => onDateSelect(date)}
@@ -94,8 +93,8 @@ const DatePicker = React.memo(({ selectedDate, onDateSelect, minDate }) => {
                     color: selected
                       ? colors.textWhite
                       : today
-                      ? colors.primary
-                      : colors.textSecondary,
+                        ? colors.primary
+                        : colors.textSecondary,
                   },
                 ]}
               >
@@ -108,8 +107,8 @@ const DatePicker = React.memo(({ selectedDate, onDateSelect, minDate }) => {
                     color: selected
                       ? colors.textWhite
                       : today
-                      ? colors.primary
-                      : colors.text,
+                        ? colors.primary
+                        : colors.text,
                   },
                 ]}
               >
@@ -122,8 +121,8 @@ const DatePicker = React.memo(({ selectedDate, onDateSelect, minDate }) => {
                     color: selected
                       ? colors.textWhite
                       : today
-                      ? colors.primary
-                      : colors.textSecondary,
+                        ? colors.primary
+                        : colors.textSecondary,
                   },
                 ]}
               >
@@ -148,58 +147,6 @@ DatePicker.propTypes = {
   minDate: PropTypes.instanceOf(Date),
 };
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: SPACING.lg,
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: SPACING.md,
-    paddingHorizontal: SPACING.md,
-  },
-  scrollContent: {
-    paddingHorizontal: SPACING.md,
-    gap: SPACING.sm,
-  },
-  dateCard: {
-    width: 70,
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.sm,
-    borderRadius: SIZES.radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    ...SIZES.shadow.small,
-  },
-  weekday: {
-    fontSize: 12,
-    fontWeight: '600',
-    marginBottom: SPACING.xs / 2,
-    textTransform: 'uppercase',
-  },
-  day: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: SPACING.xs / 2,
-  },
-  month: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  todayBadge: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    paddingHorizontal: SPACING.xs,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  todayText: {
-    fontSize: 8,
-    fontWeight: '700',
-  },
-});
-
 export default DatePicker;
+
 

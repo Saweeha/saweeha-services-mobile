@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../../hooks/useTheme';
-import { SPACING } from '../../../constants/spacing';
-import { SIZES } from '../../../constants/sizes';
+import createInfoCardStyles from './InfoCard.styles';
 
 const InfoCard = React.memo(({ icon, title, content }) => {
   const { colors } = useTheme();
+  const styles = useMemo(() => createInfoCardStyles(colors), [colors]);
 
   return (
     <View style={styles.container}>
@@ -28,31 +28,6 @@ InfoCard.propTypes = {
   content: PropTypes.string.isRequired,
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    gap: SPACING.md,
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    flex: 1,
-    gap: SPACING.xs / 2,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  text: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-});
-
 export default InfoCard;
+
 

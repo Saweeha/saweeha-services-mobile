@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useTheme } from '../../../hooks/useTheme';
-import { SPACING } from '../../../constants/spacing';
-import { SIZES } from '../../../constants/sizes';
+import createServiceCategoryFilterStyles from './ServiceCategoryFilter.styles';
 
 const ServiceCategoryFilter = React.memo(({ categories = [], activeCategory, onCategoryChange }) => {
   const { colors } = useTheme();
+  const styles = useMemo(() => createServiceCategoryFilterStyles(colors), [colors]);
 
   if (!categories || categories.length === 0) {
     return null;
@@ -64,25 +64,6 @@ ServiceCategoryFilter.propTypes = {
   onCategoryChange: PropTypes.func,
 };
 
-const styles = StyleSheet.create({
-  container: {
-
-  },
-  scrollContent: {
-    paddingHorizontal: SPACING.md,
-    gap: SPACING.sm,
-  },
-  categoryChip: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: SIZES.radius.round,
-    borderWidth: 1,
-    marginRight: SPACING.sm,
-  },
-  categoryText: {
-    fontSize: 14,
-  },
-});
-
 export default ServiceCategoryFilter;
+
 

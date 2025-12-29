@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Animated, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Animated, View, TouchableOpacity } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,10 +8,11 @@ import { useTheme } from '../../../hooks/useTheme';
 import { useScrollChannelContext } from '../../../contexts/ScrollContext';
 import CustomHeader from '../CustomHeader/CustomHeader';
 import { SPACING } from '../../../constants/spacing';
-import { SIZES } from '../../../constants/sizes';
+import createAnimatedHeaderStyles from './AnimatedHeader.styles';
 
 const AnimatedHeader = ({ title, onBackPress, showBackButton, rightComponent, threshold = 100 }) => {
   const { scheme, colors } = useTheme();
+  const styles = useMemo(() => createAnimatedHeaderStyles(colors), [colors]);
   const { activeScrollChannel } = useScrollChannelContext();
   const insets = useSafeAreaInsets();
   const isDark = scheme === 'dark';
@@ -102,34 +103,6 @@ const AnimatedHeader = ({ title, onBackPress, showBackButton, rightComponent, th
   );
 };
 
-const styles = StyleSheet.create({
-  headerContainer: {
-    flex: 1,
-  },
-  blurView: {
-    overflow: 'hidden',
-  },
-  floatingBackButtonContainer: {
-    position: 'absolute',
-    left: SPACING.lg,
-    zIndex: 1000,
-  },
-  floatingBackButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  floatingBackButtonInner: {
-    width: 44,
-    height: 44,
-    borderRadius: SIZES.radius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...SIZES.shadow.small,
-  },
-});
-
 AnimatedHeader.propTypes = {
   title: PropTypes.string.isRequired,
   onBackPress: PropTypes.func,
@@ -146,3 +119,4 @@ AnimatedHeader.defaultProps = {
 };
 
 export default AnimatedHeader;
+

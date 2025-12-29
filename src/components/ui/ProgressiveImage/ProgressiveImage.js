@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Animated, Image } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, Animated } from 'react-native';
+import createProgressiveImageStyles from './ProgressiveImage.styles';
+import { useTheme } from '../../../hooks/useTheme';
 
 const ProgressiveImage = ({ thumbnailSource, source, style, ...props }) => {
+    const { colors } = useTheme();
+    const styles = useMemo(() => createProgressiveImageStyles(colors), [colors]);
     const [thumbnailAnimated] = useState(new Animated.Value(0));
     const [imageAnimated] = useState(new Animated.Value(0));
 
@@ -49,18 +53,5 @@ const ProgressiveImage = ({ thumbnailSource, source, style, ...props }) => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#e1e4e8',
-        overflow: 'hidden',
-    },
-    imageOverlay: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        bottom: 0,
-        top: 0,
-    },
-});
-
 export default ProgressiveImage;
+

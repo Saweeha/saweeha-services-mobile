@@ -1,20 +1,20 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../../hooks/useTheme';
-import { SPACING } from '../../../constants/spacing';
-import { SIZES } from '../../../constants/sizes';
+import createTimeSlotPickerStyles from './TimeSlotPicker.styles';
 
 const TimeSlotPicker = React.memo(({ selectedTime, onTimeSelect, selectedDate }) => {
   const { colors } = useTheme();
+  const styles = useMemo(() => createTimeSlotPickerStyles(colors), [colors]);
 
   // Generate time slots from 9 AM to 9 PM in 30-minute intervals
   const timeSlots = useMemo(() => {
     const slots = [];
     const startHour = 9;
     const endHour = 21; // 9 PM
-    
+
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
@@ -22,7 +22,7 @@ const TimeSlotPicker = React.memo(({ selectedTime, onTimeSelect, selectedDate })
         slots.push({ time, displayTime });
       }
     }
-    
+
     return slots;
   }, []);
 
@@ -75,13 +75,13 @@ const TimeSlotPicker = React.memo(({ selectedTime, onTimeSelect, selectedDate })
                     backgroundColor: selected
                       ? colors.primary
                       : past
-                      ? colors.backgroundSecondary
-                      : colors.backgroundLight,
+                        ? colors.backgroundSecondary
+                        : colors.backgroundLight,
                     borderColor: selected
                       ? colors.primary
                       : past
-                      ? colors.border
-                      : colors.border,
+                        ? colors.border
+                        : colors.border,
                     opacity: past ? 0.5 : 1,
                   },
                 ]}
@@ -96,8 +96,8 @@ const TimeSlotPicker = React.memo(({ selectedTime, onTimeSelect, selectedDate })
                       color: selected
                         ? colors.textWhite
                         : past
-                        ? colors.textLight
-                        : colors.text,
+                          ? colors.textLight
+                          : colors.text,
                     },
                   ]}
                 >
@@ -121,44 +121,6 @@ TimeSlotPicker.propTypes = {
   selectedDate: PropTypes.instanceOf(Date),
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: SPACING.md,
-    paddingHorizontal: SPACING.md,
-  },
-  scrollContent: {
-    paddingHorizontal: SPACING.md,
-    paddingBottom: SPACING.xl,
-  },
-  timeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.sm,
-  },
-  timeSlot: {
-    flex: 1,
-    minWidth: '30%',
-    maxWidth: '48%',
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.sm,
-    borderRadius: SIZES.radius.md,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    gap: SPACING.xs,
-    ...SIZES.shadow.small,
-  },
-  timeText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});
-
 export default TimeSlotPicker;
+
 
